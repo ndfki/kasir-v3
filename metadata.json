@@ -1,0 +1,10 @@
+{
+  "name": "Remix Remix x 6 DataStatistik - PHP \u0026 MySQL Statistical Suite",
+  "description": "Aplikasi Data Statistik Multi-Sheet dinamis berbasis PHP, MySQL/MariaDB, Chart.js, ekspor XLSX/CSV/PDF, siap diunduh dalam ZIP untuk XAMPP dan Ubuntu Linux.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

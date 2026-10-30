@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="theme-color" content="#2563eb" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)" />
+    <title>GreenMart - Sistem Kasir POS &amp; Rekap Statistik Harian (PHP &amp; MySQL)</title>
+    <meta name="description" content="Sistem kasir GreenMart dengan fitur scan barcode otomatis, input barang, hitung total belanja &amp; kembalian, serta rekap statistik harian otomatis (modus, mean omset, total pendapatan) berbasis MySQL, siap dideploy di XAMPP dan VirtualBox." />
+    <meta property="og:title" content="GreenMart - Sistem Kasir POS &amp; Rekap Statistik Harian (PHP &amp; MySQL)" />
+    <meta property="og:description" content="Sistem kasir GreenMart dengan fitur scan barcode otomatis, input barang, hitung total belanja &amp; kembalian, serta rekap statistik harian otomatis (modus, mean omset, total pendapatan) berbasis MySQL, siap dideploy di XAMPP dan VirtualBox." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+      // Ignore harmless Vite HMR WebSocket errors in AI Studio iframe environment
+      window.addEventListener('error', function(event) {
+        var msg = (event && (event.message || '')) + '';
+        if (msg.indexOf('WebSocket') !== -1 || msg.indexOf('createWebSocketModuleRunnerTransport') !== -1) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+        }
+      }, true);
+      window.addEventListener('unhandledrejection', function(event) {
+        var reason = (event && event.reason && (event.reason.message || event.reason.stack)) || String((event && event.reason) || '');
+        if (reason.indexOf('WebSocket') !== -1 || reason.indexOf('createWebSocketModuleRunnerTransport') !== -1) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+        }
+      }, true);
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+
