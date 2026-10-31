@@ -101,14 +101,14 @@ export const GreenMartDeployModal: React.FC<GreenMartDeployModalProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="text-base sm:text-lg font-black tracking-tight">
-                  Deploy GreenMart ke XAMPP &amp; VirtualBox Linux
+                  Cadangkan Berkas &amp; Pengaturan Server Mandiri
                 </h3>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-400 text-slate-950">
-                  PHP &amp; MySQL
+                  Sistem Mandiri
                 </span>
               </div>
               <p className="text-xs text-emerald-200 mt-0.5">
-                Download paket mandiri .ZIP &bull; Skrip SQL database lengkap &bull; Panduan instalasi
+                Download paket mandiri .ZIP &bull; Berkas basis data lengkap &bull; Panduan implementasi server
               </p>
             </div>
           </div>
@@ -131,7 +131,7 @@ export const GreenMartDeployModal: React.FC<GreenMartDeployModalProps> = ({
             }`}
           >
             <Download className="w-4 h-4" />
-            <span>1. Download Paket .ZIP</span>
+            <span>1. Unduh Berkas ZIP</span>
           </button>
 
           <button
@@ -143,7 +143,7 @@ export const GreenMartDeployModal: React.FC<GreenMartDeployModalProps> = ({
             }`}
           >
             <Database className="w-4 h-4" />
-            <span>2. Skrip SQL Database</span>
+            <span>2. Berkas Basis Data</span>
           </button>
 
           <button
@@ -155,7 +155,7 @@ export const GreenMartDeployModal: React.FC<GreenMartDeployModalProps> = ({
             }`}
           >
             <Server className="w-4 h-4" />
-            <span>3. Panduan XAMPP</span>
+            <span>3. Panduan Server Komputer</span>
           </button>
 
           <button
@@ -167,7 +167,7 @@ export const GreenMartDeployModal: React.FC<GreenMartDeployModalProps> = ({
             }`}
           >
             <Terminal className="w-4 h-4" />
-            <span>4. Panduan VirtualBox Linux</span>
+            <span>4. Panduan Server Jaringan</span>
           </button>
 
           <button
@@ -179,7 +179,7 @@ export const GreenMartDeployModal: React.FC<GreenMartDeployModalProps> = ({
             }`}
           >
             <FileCode className="w-4 h-4" />
-            <span>5. Source Code PHP</span>
+            <span>5. Berkas Sumber Sistem</span>
           </button>
         </div>
 
@@ -198,7 +198,7 @@ export const GreenMartDeployModal: React.FC<GreenMartDeployModalProps> = ({
                   Unduh Paket Komplet GreenMart (.ZIP)
                 </h4>
                 <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-lg mx-auto">
-                  Paket siap pakai berisi seluruh source code PHP Native, skrip database MySQL (<code className="font-mono text-emerald-600">database_greenmart.sql</code>), dan buku panduan instalasi lengkap.
+                  Paket siap pakai berisi seluruh berkas program sistem, skrip basis data (<code className="font-mono text-emerald-600">database_greenmart.sql</code>), dan panduan pengaturan lengkap.
                 </p>
               </div>
 
@@ -210,7 +210,7 @@ export const GreenMartDeployModal: React.FC<GreenMartDeployModalProps> = ({
                     <span>database_greenmart.sql</span>
                   </div>
                   <p className="text-[11px] text-slate-500">
-                    Tabel produk, transaksi, detail, rekap, serta query view kalkulasi otomatis Modus &amp; Mean.
+                    Tabel produk, transaksi, detail, rekap, serta kalkulasi otomatis Modus &amp; Mean.
                   </p>
                 </div>
 
@@ -240,7 +240,7 @@ export const GreenMartDeployModal: React.FC<GreenMartDeployModalProps> = ({
                     <span>PANDUAN_INSTALASI.md</span>
                   </div>
                   <p className="text-[11px] text-slate-500">
-                    Panduan instalasi XAMPP dan VirtualBox Ubuntu langkah demi langkah lengkap.
+                    Panduan pengaturan server komputer dan jaringan lokal langkah demi langkah lengkap.
                   </p>
                 </div>
               </div>
@@ -262,7 +262,7 @@ export const GreenMartDeployModal: React.FC<GreenMartDeployModalProps> = ({
                   <span>{isDownloading ? 'Sedang Memaketkan File ZIP...' : 'Unduh Sekarang (GreenMart_Suite.zip)'}</span>
                 </button>
                 <p className="text-xs text-slate-400 mt-2">
-                  Kompatibel dengan XAMPP v7.4 - v8.3+ &bull; Linux Ubuntu Server / VirtualBox
+                  Kompatibel dengan semua sistem komputer &bull; Siap dijalankan di jaringan lokal / Wi-Fi
                 </p>
               </div>
             </div>
@@ -275,10 +275,10 @@ export const GreenMartDeployModal: React.FC<GreenMartDeployModalProps> = ({
                 <div>
                   <h4 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
                     <Database className="w-4 h-4 text-emerald-600" />
-                    <span>Skrip Database MySQL: database_greenmart.sql</span>
+                    <span>Berkas Basis Data: database_greenmart.sql</span>
                   </h4>
                   <p className="text-xs text-slate-500 dark:text-slate-400">
-                    Skema tabel, relasi foreign keys, indeks barcode, query view modus &amp; mean omset, serta data awal.
+                    Skema tabel, relasi data, indeks barcode, query kalkulasi modus &amp; mean omset, serta data awal.
                   </p>
                 </div>
                 <button
@@ -287,7 +287,7 @@ export const GreenMartDeployModal: React.FC<GreenMartDeployModalProps> = ({
                   className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition cursor-pointer"
                 >
                   {copied === 'sql' ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                  <span>{copied === 'sql' ? 'Tersalin ke Clipboard!' : 'Salin Semua Skrip SQL'}</span>
+                  <span>{copied === 'sql' ? 'Tersalin ke Clipboard!' : 'Salin Skrip Basis Data'}</span>
                 </button>
               </div>
 
@@ -297,16 +297,16 @@ export const GreenMartDeployModal: React.FC<GreenMartDeployModalProps> = ({
             </div>
           )}
 
-          {/* TAB 3: PANDUAN XAMPP */}
+          {/* TAB 3: PANDUAN SERVER KOMPUTER */}
           {activeTab === 'xampp' && (
             <div className="space-y-4 max-w-3xl mx-auto">
               <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/80">
                 <h4 className="font-bold text-sm text-emerald-900 dark:text-emerald-200 flex items-center gap-2">
                   <Server className="w-4 h-4 text-emerald-600" />
-                  <span>Langkah Cepat Instalasi di XAMPP Windows / Mac</span>
+                  <span>Langkah Cepat Pengaturan di Server Komputer Lokal</span>
                 </h4>
                 <p className="text-xs text-emerald-700 dark:text-emerald-300 mt-1">
-                  Ikuti 4 langkah mudah berikut untuk menjalankan GreenMart di PC lokal Anda.
+                  Ikuti 4 langkah mudah berikut untuk menjalankan GreenMart di komputer lokal Anda.
                 </p>
               </div>
 
@@ -314,30 +314,30 @@ export const GreenMartDeployModal: React.FC<GreenMartDeployModalProps> = ({
                 <div className="p-4 rounded-2xl bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 space-y-1.5">
                   <div className="font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
                     <span className="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs">1</span>
-                    <span>Ekstrak ZIP ke Folder htdocs</span>
+                    <span>Ekstrak Berkas ZIP ke Direktori Server Lokal</span>
                   </div>
                   <p className="text-slate-600 dark:text-slate-400 pl-8">
-                    Buka folder <code className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-700 font-mono text-emerald-600">C:\xampp\htdocs</code>. Buat folder baru bernama <code className="font-mono text-emerald-600">greenmart</code>, lalu ekstrak seluruh file ZIP ke dalamnya.
+                    Buka folder server web lokal di komputer Anda. Buat folder baru bernama <code className="font-mono text-emerald-600">greenmart</code>, lalu ekstrak seluruh berkas ZIP ke dalamnya.
                   </p>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 space-y-1.5">
                   <div className="font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
                     <span className="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs">2</span>
-                    <span>Start Apache &amp; MySQL di XAMPP Control Panel</span>
+                    <span>Aktifkan Layanan Web Server &amp; Layanan Data</span>
                   </div>
                   <p className="text-slate-600 dark:text-slate-400 pl-8">
-                    Buka XAMPP Control Panel, lalu klik tombol <strong>Start</strong> di sebelah modul <strong>Apache</strong> dan modul <strong>MySQL</strong> hingga indikator berwarna hijau.
+                    Buka panel kontrol server lokal di komputer Anda, lalu aktifkan layanan modul web server dan pusat data hingga status aktif berwarna hijau.
                   </p>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 space-y-1.5">
                   <div className="font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
                     <span className="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs">3</span>
-                    <span>Impor Database di phpMyAdmin</span>
+                    <span>Impor Berkas Basis Data</span>
                   </div>
                   <p className="text-slate-600 dark:text-slate-400 pl-8">
-                    Buka browser dan buka <code className="font-mono text-emerald-600">http://localhost/phpmyadmin</code>. Klik tab <strong>Import</strong>, pilih file <code className="font-mono text-emerald-600">database_greenmart.sql</code>, lalu klik tombol <strong>Import / Kirim</strong>.
+                    Buka panel pengelola database di browser. Pilih menu Impor, pilih berkas <code className="font-mono text-emerald-600">database_greenmart.sql</code>, lalu klik tombol Impor / Jalankan.
                   </p>
                 </div>
 
@@ -359,16 +359,16 @@ export const GreenMartDeployModal: React.FC<GreenMartDeployModalProps> = ({
             </div>
           )}
 
-          {/* TAB 4: PANDUAN VIRTUALBOX LINUX */}
+          {/* TAB 4: PANDUAN SERVER JARINGAN */}
           {activeTab === 'virtualbox' && (
             <div className="space-y-4 max-w-3xl mx-auto">
               <div className="p-4 rounded-2xl bg-teal-50 dark:bg-teal-950/40 border border-teal-200 dark:border-teal-800/80">
                 <h4 className="font-bold text-sm text-teal-900 dark:text-teal-200 flex items-center gap-2">
                   <Terminal className="w-4 h-4 text-teal-600" />
-                  <span>Panduan Deployment di VirtualBox (Ubuntu Linux Server)</span>
+                  <span>Panduan Pengaturan Server Jaringan Lokal (Komputer Host / Server Mandiri)</span>
                 </h4>
                 <p className="text-xs text-teal-700 dark:text-teal-300 mt-1">
-                  Jalankan GreenMart di virtual machine Ubuntu sehingga dapat diakses oleh HP kasir atau komputer lain dalam satu jaringan Wi-Fi.
+                  Jalankan GreenMart di server jaringan mandiri sehingga dapat diakses bersama oleh beberapa kasir atau perangkat lain dalam satu jaringan Wi-Fi lokal.
                 </p>
               </div>
 
@@ -377,10 +377,10 @@ export const GreenMartDeployModal: React.FC<GreenMartDeployModalProps> = ({
                 <div className="p-4 rounded-2xl bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 space-y-2">
                   <div className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
                     <span className="w-5 h-5 rounded-full bg-teal-600 text-white flex items-center justify-center text-[10px]">1</span>
-                    <span>Setting Network VirtualBox: Bridged Adapter</span>
+                    <span>Konfigurasi Adapter Jaringan (Bridge ke Router / Wi-Fi)</span>
                   </div>
                   <p className="text-slate-500 text-[11px] pl-7">
-                    Di VirtualBox, buka VM Settings &gt; Network &gt; ubah 'Attached to' menjadi <strong>Bridged Adapter</strong> agar VM mendapat IP sendiri dari router Wi-Fi.
+                    Di pengaturan jaringan server, atur adapter menjadi <strong>Bridged Adapter</strong> agar mesin server memperoleh alamat IP mandiri langsung dari router Wi-Fi.
                   </p>
                 </div>
 
@@ -388,7 +388,7 @@ export const GreenMartDeployModal: React.FC<GreenMartDeployModalProps> = ({
                 <div className="p-4 rounded-2xl bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 space-y-2">
                   <div className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
                     <span className="w-5 h-5 rounded-full bg-teal-600 text-white flex items-center justify-center text-[10px]">2</span>
-                    <span>Perintah CLI Terminal Ubuntu: Install Apache, PHP &amp; MySQL</span>
+                    <span>Pemasangan Paket Layanan Server</span>
                   </div>
                   <div className="pl-7">
                     <div className="bg-slate-950 text-slate-200 p-3 rounded-xl font-mono text-[11px] space-y-1">
@@ -402,14 +402,14 @@ export const GreenMartDeployModal: React.FC<GreenMartDeployModalProps> = ({
                 <div className="p-4 rounded-2xl bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 space-y-2">
                   <div className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
                     <span className="w-5 h-5 rounded-full bg-teal-600 text-white flex items-center justify-center text-[10px]">3</span>
-                    <span>Deploy File &amp; Impor Database</span>
+                    <span>Penempatan Berkas &amp; Impor Basis Data</span>
                   </div>
                   <div className="pl-7">
                     <div className="bg-slate-950 text-slate-200 p-3 rounded-xl font-mono text-[11px] space-y-1">
                       <div>sudo mkdir -p /var/www/html/greenmart</div>
                       <div>sudo unzip GreenMart_Suite.zip -d /var/www/html/greenmart/</div>
                       <div>sudo chown -R www-data:www-data /var/www/html/greenmart</div>
-                      <div className="text-emerald-400"># Impor database:</div>
+                      <div className="text-emerald-400"># Impor berkas basis data:</div>
                       <div>sudo mysql &lt; /var/www/html/greenmart/database_greenmart.sql</div>
                     </div>
                   </div>
@@ -419,10 +419,10 @@ export const GreenMartDeployModal: React.FC<GreenMartDeployModalProps> = ({
                 <div className="p-4 rounded-2xl bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 space-y-2">
                   <div className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
                     <span className="w-5 h-5 rounded-full bg-teal-600 text-white flex items-center justify-center text-[10px]">4</span>
-                    <span>Akses dari HP / Komputer Host via IP LAN</span>
+                    <span>Akses dari HP / Komputer Kasir via Alamat Jaringan</span>
                   </div>
                   <p className="text-slate-500 text-[11px] pl-7">
-                    Jalankan <code className="font-mono text-emerald-600">ip a</code> di terminal Ubuntu untuk cek IP (misal <code className="font-mono text-emerald-600">192.168.1.150</code>). Buka browser di laptop atau smartphone kasir Anda di alamat: <code className="font-mono text-emerald-600">http://192.168.1.150/greenmart/kasir.php</code>
+                    Jalankan <code className="font-mono text-emerald-600">ip a</code> di terminal server untuk cek alamat IP (misal <code className="font-mono text-emerald-600">192.168.1.150</code>). Buka browser di laptop atau smartphone kasir Anda di alamat: <code className="font-mono text-emerald-600">http://192.168.1.150/greenmart/kasir.php</code>
                   </p>
                 </div>
               </div>
@@ -471,7 +471,7 @@ export const GreenMartDeployModal: React.FC<GreenMartDeployModalProps> = ({
         {/* Footer */}
         <div className="p-4 bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0">
           <span className="text-xs text-slate-500 dark:text-slate-400">
-            GreenMart POS &bull; PHP Native &amp; MySQL
+            GreenMart POS &bull; Sistem Kasir Mandiri &amp; Terpadu
           </span>
           <div className="flex items-center gap-2">
             <button

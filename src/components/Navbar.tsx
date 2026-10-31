@@ -72,7 +72,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   DataStatistik
                 </h1>
                 <span className="hidden md:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
-                  POS &amp; MySQL
+                  POS &amp; Kasir Mandiri
                 </span>
               </div>
               <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate max-w-[150px] sm:max-w-none">

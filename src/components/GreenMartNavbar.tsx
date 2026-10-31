@@ -150,45 +150,18 @@ export const GreenMartNavbar: React.FC<GreenMartNavbarProps> = ({
           </nav>
 
           {/* Right Action Area */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             
-            {/* Active Cashier Shift Badge (Desktop / Tablet) */}
-            {activeCashier && onOpenCashierDutyModal && (
-              <button
-                type="button"
-                onClick={onOpenCashierDutyModal}
-                className="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-900/60 border border-emerald-300 dark:border-emerald-700/80 text-slate-800 dark:text-emerald-100 text-xs transition cursor-pointer shadow-xs group"
-                title={`Kasir yang bertugas: ${activeCashier.name} (${activeCashier.studentClass || 'Siswa'}) - Shift ${activeCashier.shift}`}
-              >
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span className="text-slate-500 dark:text-slate-400 font-medium">Kasir:</span>
-                <strong className="font-extrabold text-emerald-800 dark:text-emerald-300 group-hover:underline max-w-[130px] truncate">
-                  {activeCashier.name}
-                </strong>
-                {activeCashier.studentClass && (
-                  <span className="text-[10px] px-1.5 py-0.2 rounded bg-emerald-200/80 dark:bg-emerald-900 text-emerald-900 dark:text-emerald-200 font-bold">
-                    {activeCashier.studentClass}
-                  </span>
-                )}
-                <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-emerald-600 text-white font-bold">
-                  {activeCashier.shift}
-                </span>
-                <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 underline ml-0.5">
-                  Ganti
-                </span>
-              </button>
-            )}
-
-            {/* Deploy XAMPP / VirtualBox Button */}
+            {/* Deploy / Download ZIP Button */}
             <button
               type="button"
               onClick={onOpenDeployModal}
-              className="inline-flex items-center gap-2 px-3 sm:px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm shadow-sm transition cursor-pointer"
-              title="Download Source Code PHP & Database SQL untuk XAMPP / VirtualBox"
+              className="inline-flex items-center gap-1.5 px-3 sm:px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-xs sm:text-sm shadow-xs transition cursor-pointer"
+              title="Unduh Cadangan Berkas Sistem (.ZIP)"
             >
               <Download className="w-4 h-4" />
-              <span className="hidden lg:inline">Download ZIP</span>
-              <span className="lg:hidden">ZIP</span>
+              <span className="hidden sm:inline">Download ZIP</span>
+              <span className="sm:hidden">ZIP</span>
             </button>
 
             {/* Shortcuts Guide Button */}
@@ -217,15 +190,20 @@ export const GreenMartNavbar: React.FC<GreenMartNavbarProps> = ({
                 <button
                   type="button"
                   onClick={onOpenCashierDutyModal}
-                  className="hidden sm:flex flex-col text-left px-2 py-1 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                  className="flex items-center gap-2 px-2.5 py-1 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/80 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700/80 transition cursor-pointer group"
                   title={`Petugas login: ${currentUser.name} - Kelas: ${currentUser.studentClass || '-'} (NIS: ${currentUser.nis})`}
                 >
-                  <span className="text-[11px] font-bold text-slate-900 dark:text-white leading-tight truncate max-w-[120px]">
-                    {currentUser.name} {currentUser.studentClass ? `(${currentUser.studentClass})` : ''}
-                  </span>
-                  <span className="text-[10px] font-mono text-slate-400 leading-tight">
-                    NIS: {currentUser.nis}
-                  </span>
+                  <div className="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 flex items-center justify-center font-black text-xs shrink-0">
+                    {currentUser.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="hidden sm:flex flex-col text-left">
+                    <span className="text-[11px] font-bold text-slate-900 dark:text-white leading-tight truncate max-w-[110px] group-hover:text-emerald-600 dark:group-hover:text-emerald-400">
+                      {currentUser.name}
+                    </span>
+                    <span className="text-[9.5px] font-mono text-slate-400 leading-tight">
+                      {currentUser.studentClass || `NIS: ${currentUser.nis}`}
+                    </span>
+                  </div>
                 </button>
 
                 <button

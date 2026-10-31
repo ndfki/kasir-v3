@@ -36,7 +36,7 @@ export function generateStatisticsPdf(
     cashierName = 'Kasir Penanggung Jawab',
     managerName = 'Manajer Operasional',
     storeCity = 'Batang',
-    customNotes = 'Laporan resmi ini disajikan otomatis berdasarkan rekaman data transaksi kasir dan mutasi stok di sistem basis data MySQL GreenMart.'
+    customNotes = 'Laporan resmi ini disajikan otomatis berdasarkan rekaman data transaksi kasir dan mutasi stok di pusat data terpadu GreenMart.'
   } = options;
 
   const doc = new jsPDF({
@@ -73,77 +73,89 @@ export function generateStatisticsPdf(
 
   // Logo GreenMart
   try {
-    doc.addImage(GREENMART_LOGO_COLOR_BASE64, 'PNG', marginX, 9, 16, 16);
+    doc.addImage(GREENMART_LOGO_COLOR_BASE64, 'PNG', marginX, 8, 17, 17);
   } catch (e) {
     console.warn('Could not add logo to PDF header:', e);
   }
 
-  const headerTextX = marginX + 19;
-  const textAvailableWidth = contentWidth - 19;
+  const headerTextX = marginX + 21;
 
   // Store Brand Title
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(15);
+  doc.setFontSize(14);
   doc.setTextColor(15, 23, 42); // slate-900
-  doc.text(storeName, headerTextX, 15);
+  doc.text(storeName, headerTextX, 13);
 
-  // Subtitle (Alamat Resmi Batang)
+  // Alamat Resmi Toko Batang (Line 1)
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8);
+  doc.setFontSize(7.5);
   doc.setTextColor(71, 85, 105); // slate-600
-  doc.text(storeAddress, headerTextX, 20, { maxWidth: textAvailableWidth });
+  doc.text('Jl. Ki Mangunsarkoro No.2, 03, Dracik Barat, Proyonanggan Sel., Kec. Batang, Kabupaten Batang, Jawa Tengah 51216', headerTextX, 17.5);
 
-  // Document Badge
+  // Kontak & Koperasi (Line 2)
+  doc.setFontSize(7.5);
+  doc.setTextColor(100, 116, 139); // slate-500
+  doc.text('Telp: (0285) 391-234   |   Email: batang@greenmart.id   |   Unit Koperasi Siswa Batang', headerTextX, 21.5);
+
+  // Document Badge (Line 3 - Clean official text without technical jargon)
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(7.5);
-  doc.setTextColor(16, 185, 129);
-  doc.text('SISTEM POS & REKAPITULASI STATISTIK HARIAN TERINTEGRASI MYSQL', headerTextX, 25);
+  doc.setTextColor(16, 185, 129); // emerald-600
+  doc.text('SISTEM KASIR POS & REKAPITULASI STATISTIK HARIAN RESMI', headerTextX, 26);
 
   // Divider Line
+  const dividerY = 29.5;
   doc.setDrawColor(203, 213, 225); // slate-300
   doc.setLineWidth(0.6);
-  doc.line(marginX, 29, pageWidth - marginX, 29);
+  doc.line(marginX, dividerY, pageWidth - marginX, dividerY);
 
   // -------------------------------------------------------------
   // JUDUL LAPORAN & METADATA RESMI
   // -------------------------------------------------------------
+  const titleY = dividerY + 6.5;
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(13);
+  doc.setFontSize(12.5);
   doc.setTextColor(15, 23, 42);
-  doc.text('LAPORAN KEUANGAN & STATISTIK PENJUALAN RESMI', marginX, 36);
+  doc.text('LAPORAN KEUANGAN & STATISTIK PENJUALAN RESMI', marginX, titleY);
 
   // Metadata Card / Box
+  const metaBoxY = titleY + 3.5;
+  const metaBoxHeight = 16.5;
   doc.setFillColor(248, 250, 252); // slate-50
   doc.setDrawColor(226, 232, 240); // slate-200
   doc.setLineWidth(0.3);
-  doc.roundedRect(marginX, 39, contentWidth, 19, 2, 2, 'FD');
+  doc.roundedRect(marginX, metaBoxY, contentWidth, metaBoxHeight, 2, 2, 'FD');
 
-  doc.setFontSize(8);
+  const metaLabelY = metaBoxY + 5;
+  const metaValY = metaBoxY + 11.5;
+
+  doc.setFontSize(7.5);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(100, 116, 139); // slate-500
-  doc.text('NO. DOKUMEN', marginX + 4, 44);
-  doc.text('PERIODE DATA', marginX + 50, 44);
-  doc.text('WAKTU CETAK', marginX + 105, 44);
-  doc.text('STATUS AUDIT', marginX + 152, 44);
+  doc.text('NO. DOKUMEN', marginX + 4, metaLabelY);
+  doc.text('PERIODE DATA', marginX + 46, metaLabelY);
+  doc.text('WAKTU CETAK', marginX + 88, metaLabelY);
+  doc.text('STATUS AUDIT', marginX + 154, metaLabelY);
 
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(8.5);
+  doc.setFontSize(8);
   doc.setTextColor(30, 41, 59); // slate-800
-  doc.text(docId, marginX + 4, 50);
-  doc.text(dateFilterLabel, marginX + 50, 50);
+  doc.text(docId, marginX + 4, metaValY);
+  doc.text(dateFilterLabel, marginX + 46, metaValY);
 
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8);
-  doc.text(printTimestamp, marginX + 105, 50);
+  doc.setFontSize(7.5);
+  doc.text(printTimestamp, marginX + 88, metaValY);
 
   doc.setTextColor(16, 185, 129); // emerald-600
   doc.setFont('helvetica', 'bold');
-  doc.text('TERVERIFIKASI', marginX + 152, 50);
+  doc.setFontSize(8.5);
+  doc.text('TERVERIFIKASI', marginX + 154, metaValY);
 
   // -------------------------------------------------------------
   // BAGIAN 1: RINGKASAN METRIK KEUANGAN & INDIKATOR STATISTIK (KPIs)
   // -------------------------------------------------------------
-  let currentY = 63;
+  let currentY = metaBoxY + metaBoxHeight + 7;
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(10.5);
   doc.setTextColor(15, 23, 42);
@@ -620,40 +632,48 @@ export function generateTransactionHistoryPdf(
     console.warn('Could not add logo to history PDF:', e);
   }
 
-  const histHeaderX = marginX + 19;
-  const histTextWidth = pageWidth - marginX * 2 - 20;
+  const histHeaderX = marginX + 21;
 
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(15);
+  doc.setFontSize(14);
   doc.setTextColor(15, 23, 42);
-  doc.text(storeName, histHeaderX, 14.5);
+  doc.text(storeName, histHeaderX, 13);
 
+  // Alamat Resmi Toko Batang (Line 1)
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8);
+  doc.setFontSize(7.5);
   doc.setTextColor(71, 85, 105);
-  doc.text(storeAddress, histHeaderX, 19.5, { maxWidth: histTextWidth });
+  doc.text('Jl. Ki Mangunsarkoro No.2, 03, Dracik Barat, Proyonanggan Sel., Kec. Batang, Kabupaten Batang, Jawa Tengah 51216', histHeaderX, 17.5);
 
+  // Kontak & Koperasi (Line 2)
+  doc.setFontSize(7.5);
+  doc.setTextColor(100, 116, 139);
+  doc.text('Telp: (0285) 391-234   |   Email: batang@greenmart.id   |   Unit Koperasi Siswa Batang', histHeaderX, 21.5);
+
+  // Document Badge (Line 3)
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(7.5);
   doc.setTextColor(16, 185, 129);
-  doc.text('SISTEM KASIR POS & REKAP TRANSAKSI HARIAN TERINTEGRASI MYSQL', histHeaderX, 24.5);
+  doc.text('SISTEM KASIR POS & REKAP TRANSAKSI HARIAN RESMI', histHeaderX, 26);
 
+  const histDividerY = 29.5;
   doc.setDrawColor(203, 213, 225);
   doc.setLineWidth(0.6);
-  doc.line(marginX, 28, pageWidth - marginX, 28);
+  doc.line(marginX, histDividerY, pageWidth - marginX, histDividerY);
 
   // -------------------------------------------------------------
   // JUDUL & INFO FILTER
   // -------------------------------------------------------------
+  const histTitleY = histDividerY + 6.5;
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(12);
   doc.setTextColor(15, 23, 42);
-  doc.text('LAPORAN RESMI RIWAYAT TRANSAKSI PENJUALAN KASIR', marginX, 35);
+  doc.text('LAPORAN RESMI RIWAYAT TRANSAKSI PENJUALAN KASIR', marginX, histTitleY);
 
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8.5);
+  doc.setFontSize(8);
   doc.setTextColor(100, 116, 139);
-  doc.text(`Periode: ${dateFilterLabel} | Filter Status: ${statusFilter} | Kasir: ${cashierFilter} | Waktu Cetak: ${printTimestamp}`, marginX, 40);
+  doc.text(`Periode: ${dateFilterLabel} | Filter Status: ${statusFilter} | Kasir: ${cashierFilter} | Waktu Cetak: ${printTimestamp}`, marginX, histTitleY + 5);
 
   // -------------------------------------------------------------
   // STATISTIK RINGKASAN TRANSAKSI (METRIC BOXES)
@@ -872,4 +892,387 @@ export function exportTransactionHistoryReportPdf(
   const filename = `Laporan_Riwayat_Transaksi_GreenMart_${cleanDate}.pdf`;
   doc.save(filename);
 }
+
+// =========================================================================
+// LAPORAN RESMI STOK BARANG & VALUASI INVENTARIS
+// =========================================================================
+
+export interface StockPdfExportOptions {
+  categoryFilter?: string;
+  stockStatusFilter?: string;
+  storeName?: string;
+  storeAddress?: string;
+  cashierName?: string; // Nama Petugas / Pengelola Inventaris
+  managerName?: string; // Nama Manajer Operasional
+  storeCity?: string;   // Kota Penandatanganan (default 'Batang')
+  customNotes?: string; // Catatan keterangan resmi
+}
+
+/**
+ * Generate official PDF report for Inventory Stock (Stok Barang & Valuasi Aset)
+ */
+export function generateInventoryStockPdf(
+  products: GreenMartProduct[],
+  options: StockPdfExportOptions = {}
+): jsPDF {
+  const {
+    categoryFilter = 'Semua Kategori',
+    stockStatusFilter = 'Semua Stok',
+    storeName = 'GREENMART SUPERMARKET & POS',
+    storeAddress = 'Jl. Ki Mangunsarkoro No.2, 03, Dracik Barat, Proyonanggan Sel., Kec. Batang, Kabupaten Batang, Jawa Tengah 51216 | Telp: (0285) 391-234 | Email: batang@greenmart.id',
+    storeCity = 'Batang',
+    cashierName = 'Petugas Inventaris / Kasir',
+    managerName = 'Bambang S., S.E.',
+    customNotes = 'Laporan resmi ini disajikan otomatis berdasarkan data inventaris fisik dan valuasi modal aset toko GreenMart.'
+  } = options;
+
+  const doc = new jsPDF({
+    orientation: 'landscape',
+    unit: 'mm',
+    format: 'a4'
+  });
+
+  const pageWidth = doc.internal.pageSize.getWidth(); // 297mm
+  const pageHeight = doc.internal.pageSize.getHeight(); // 210mm
+  const marginX = 14;
+
+  const today = new Date();
+  const printTimestamp = today.toLocaleDateString('id-ID', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  }) + ` pukul ${today.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB`;
+
+  const docId = `GM-STK-${today.getFullYear()}${(today.getMonth() + 1).toString().padStart(2, '0')}${today.getDate().toString().padStart(2, '0')}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
+
+  // -------------------------------------------------------------
+  // KOP SURAT RESMI
+  // -------------------------------------------------------------
+  doc.setFillColor(16, 185, 129); // emerald-600
+  doc.rect(0, 0, pageWidth, 5, 'F');
+
+  doc.setFillColor(5, 150, 105); // emerald-700
+  doc.rect(0, 5, pageWidth, 1.5, 'F');
+
+  // Logo GreenMart
+  try {
+    doc.addImage(GREENMART_LOGO_COLOR_BASE64, 'PNG', marginX, 8.5, 16, 16);
+  } catch (e) {
+    console.warn('Could not add logo to stock PDF:', e);
+  }
+
+  const headerX = marginX + 21;
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(14);
+  doc.setTextColor(15, 23, 42);
+  doc.text(storeName, headerX, 13);
+
+  // Alamat Resmi Toko Batang (Line 1)
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7.5);
+  doc.setTextColor(71, 85, 105);
+  doc.text('Jl. Ki Mangunsarkoro No.2, 03, Dracik Barat, Proyonanggan Sel., Kec. Batang, Kabupaten Batang, Jawa Tengah 51216', headerX, 17.5);
+
+  // Kontak & Koperasi (Line 2)
+  doc.setFontSize(7.5);
+  doc.setTextColor(100, 116, 139);
+  doc.text('Telp: (0285) 391-234   |   Email: batang@greenmart.id   |   Unit Koperasi Siswa Batang', headerX, 21.5);
+
+  // Document Badge (Line 3)
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(7.5);
+  doc.setTextColor(16, 185, 129);
+  doc.text('SISTEM KASIR POS & REKAPITULASI INVENTARIS STOK BARANG RESMI', headerX, 26);
+
+  const dividerY = 29.5;
+  doc.setDrawColor(203, 213, 225);
+  doc.setLineWidth(0.6);
+  doc.line(marginX, dividerY, pageWidth - marginX, dividerY);
+
+  // -------------------------------------------------------------
+  // JUDUL & INFO FILTER
+  // -------------------------------------------------------------
+  const titleY = dividerY + 6.5;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.setTextColor(15, 23, 42);
+  doc.text('LAPORAN RESMI REKAPITULASI DATA STOK & VALUASI ASET BARANG', marginX, titleY);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(100, 116, 139);
+  doc.text(`Kategori: ${categoryFilter} | Status Filter: ${stockStatusFilter} | Waktu Cetak: ${printTimestamp}`, marginX, titleY + 5);
+
+  // -------------------------------------------------------------
+  // METRIC SUMMARY CARDS
+  // -------------------------------------------------------------
+  const totalSku = products.length;
+  const totalUnits = products.reduce((sum, p) => sum + p.stock, 0);
+  const totalCostAsset = products.reduce((sum, p) => sum + p.stock * p.costPrice, 0);
+  const totalSellingValue = products.reduce((sum, p) => sum + p.stock * p.sellingPrice, 0);
+  const potentialProfit = Math.max(0, totalSellingValue - totalCostAsset);
+  const lowStockCount = products.filter(p => p.stock > 0 && p.stock <= p.minStock).length;
+  const outOfStockCount = products.filter(p => p.stock <= 0).length;
+
+  const cardY = titleY + 9;
+  const cardWidth = (pageWidth - marginX * 2 - 12) / 4;
+  const cardHeight = 15;
+
+  // Box 1: Total SKU
+  doc.setFillColor(248, 250, 252);
+  doc.setDrawColor(226, 232, 240);
+  doc.roundedRect(marginX, cardY, cardWidth, cardHeight, 2, 2, 'FD');
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7);
+  doc.setTextColor(100, 116, 139);
+  doc.text('TOTAL SKU BARANG', marginX + 3.5, cardY + 4.5);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10.5);
+  doc.setTextColor(15, 23, 42);
+  doc.text(`${totalSku} Produk`, marginX + 3.5, cardY + 11);
+
+  // Box 2: Total Unit Fisik
+  const box2X = marginX + cardWidth + 4;
+  doc.setFillColor(248, 250, 252);
+  doc.roundedRect(box2X, cardY, cardWidth, cardHeight, 2, 2, 'FD');
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7);
+  doc.setTextColor(100, 116, 139);
+  doc.text('TOTAL UNIT FISIK STOK', box2X + 3.5, cardY + 4.5);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10.5);
+  doc.setTextColor(16, 185, 129); // emerald-600
+  doc.text(`${totalUnits.toLocaleString('id-ID')} Unit`, box2X + 3.5, cardY + 11);
+
+  // Box 3: Total Valuasi Aset HPP
+  const box3X = box2X + cardWidth + 4;
+  doc.setFillColor(248, 250, 252);
+  doc.roundedRect(box3X, cardY, cardWidth, cardHeight, 2, 2, 'FD');
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7);
+  doc.setTextColor(100, 116, 139);
+  doc.text('VALUASI ASET MODAL (HPP)', box3X + 3.5, cardY + 4.5);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10.5);
+  doc.setTextColor(37, 99, 235); // blue-600
+  doc.text(formatRupiah(totalCostAsset), box3X + 3.5, cardY + 11);
+
+  // Box 4: Potensi Laba Kotor / Status
+  const box4X = box3X + cardWidth + 4;
+  doc.setFillColor(248, 250, 252);
+  doc.roundedRect(box4X, cardY, cardWidth, cardHeight, 2, 2, 'FD');
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7);
+  doc.setTextColor(100, 116, 139);
+  doc.text('POTENSI LABA KOTOR', box4X + 3.5, cardY + 4.5);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10.5);
+  doc.setTextColor(147, 51, 234); // purple-600
+  doc.text(formatRupiah(potentialProfit), box4X + 3.5, cardY + 11);
+
+  // -------------------------------------------------------------
+  // TABEL DATA STOK BARANG
+  // -------------------------------------------------------------
+  const tableData = products.map((p, idx) => {
+    const assetVal = p.stock * p.costPrice;
+    const marginRp = p.sellingPrice - p.costPrice;
+    const marginPct = p.costPrice > 0 ? Math.round((marginRp / p.costPrice) * 100) : 0;
+    const statusText = p.stock <= 0 ? 'HABIS' : p.stock <= p.minStock ? 'MENIPIS' : 'AMAN';
+
+    return [
+      String(idx + 1),
+      p.barcode,
+      p.name,
+      p.category,
+      formatRupiah(p.costPrice),
+      formatRupiah(p.sellingPrice),
+      `${marginPct}% (${formatRupiah(marginRp)})`,
+      `${p.stock} ${p.unit}`,
+      statusText,
+      formatRupiah(assetVal)
+    ];
+  });
+
+  autoTable(doc, {
+    head: [[
+      'No',
+      'Barcode',
+      'Nama Produk',
+      'Kategori',
+      'Harga Beli (HPP)',
+      'Harga Jual',
+      'Margin',
+      'Sisa Stok',
+      'Status',
+      'Valuasi Aset HPP'
+    ]],
+    body: tableData,
+    foot: [[
+      '',
+      'TOTAL',
+      `${totalSku} Produk SKU`,
+      '',
+      '',
+      '',
+      '',
+      `${totalUnits.toLocaleString('id-ID')} Unit`,
+      `${lowStockCount} Tipis / ${outOfStockCount} Habis`,
+      formatRupiah(totalCostAsset)
+    ]],
+    startY: cardY + cardHeight + 4.5,
+    margin: { left: marginX, right: marginX, bottom: 28 },
+    styles: {
+      fontSize: 7.5,
+      cellPadding: 2,
+      textColor: [30, 41, 59],
+      lineColor: [226, 232, 240],
+      lineWidth: 0.2
+    },
+    headStyles: {
+      fillColor: [16, 185, 129],
+      textColor: [255, 255, 255],
+      fontStyle: 'bold',
+      fontSize: 8,
+      halign: 'left'
+    },
+    footStyles: {
+      fillColor: [241, 245, 249],
+      textColor: [15, 23, 42],
+      fontStyle: 'bold',
+      fontSize: 8
+    },
+    alternateRowStyles: {
+      fillColor: [248, 250, 252]
+    },
+    columnStyles: {
+      0: { cellWidth: 10, halign: 'center' },
+      1: { cellWidth: 28, font: 'courier' },
+      2: { cellWidth: 'auto' },
+      3: { cellWidth: 28 },
+      4: { cellWidth: 26, halign: 'right' },
+      5: { cellWidth: 26, halign: 'right' },
+      6: { cellWidth: 28, halign: 'right' },
+      7: { cellWidth: 20, halign: 'center' },
+      8: { cellWidth: 20, halign: 'center' },
+      9: { cellWidth: 30, halign: 'right', fontStyle: 'bold' }
+    },
+    didParseCell: (data) => {
+      // Highlight status cell
+      if (data.section === 'body' && data.column.index === 8) {
+        const val = String(data.cell.raw);
+        if (val === 'HABIS') {
+          data.cell.styles.textColor = [225, 29, 72]; // rose-600
+          data.cell.styles.fontStyle = 'bold';
+        } else if (val === 'MENIPIS') {
+          data.cell.styles.textColor = [217, 119, 6]; // amber-600
+          data.cell.styles.fontStyle = 'bold';
+        } else {
+          data.cell.styles.textColor = [16, 185, 129]; // emerald-600
+        }
+      }
+    }
+  });
+
+  // -------------------------------------------------------------
+  // LEMBAR PENGESAHAN & TANDA TANGAN RESMI
+  // -------------------------------------------------------------
+  const lastTable = (doc as any).lastAutoTable;
+  let finalY = (lastTable ? lastTable.finalY : 140) + 7;
+
+  if (finalY > pageHeight - 38) {
+    doc.addPage();
+    finalY = 22;
+  }
+
+  // Catatan Dokumen
+  if (customNotes) {
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(7.5);
+    doc.setTextColor(100, 116, 139);
+    doc.text(`Catatan: ${customNotes}`, marginX, finalY);
+    finalY += 6;
+  }
+
+  const signY = finalY;
+  const colWidth = 65;
+  const rightColX = pageWidth - marginX - colWidth;
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(71, 85, 105);
+  doc.text(`${storeCity}, ${today.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`, rightColX, signY);
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8.5);
+  doc.setTextColor(15, 23, 42);
+  doc.text('Dibuat & Diverifikasi:', marginX + 8, signY + 5);
+  doc.text('Mengetahui,', rightColX, signY + 5);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.text('Kasir Penanggung Jawab', marginX + 8, signY + 10);
+  doc.text('Manajer Operasional GreenMart', rightColX, signY + 10);
+
+  // Line for signature
+  doc.setDrawColor(148, 163, 184);
+  doc.setLineWidth(0.6);
+  doc.line(marginX + 8, signY + 24, marginX + 8 + 52, signY + 24);
+  doc.line(rightColX, signY + 24, rightColX + 52, signY + 24);
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8.5);
+  doc.setTextColor(15, 23, 42);
+  doc.text(`( ${cashierName} )`, marginX + 8, signY + 28.5);
+  doc.text(`( ${managerName} )`, rightColX, signY + 28.5);
+
+  // Page numbering
+  const totalPages = doc.getNumberOfPages();
+  for (let i = 1; i <= totalPages; i++) {
+    doc.setPage(i);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.5);
+    doc.setTextColor(148, 163, 184);
+    doc.text(
+      `GreenMart Supermarket Batang - Rekap Inventaris Stok Barang | Dokumen: ${docId}`,
+      marginX,
+      pageHeight - 6.5
+    );
+    doc.text(
+      `Halaman ${i} dari ${totalPages}`,
+      pageWidth - marginX - 25,
+      pageHeight - 6.5
+    );
+  }
+
+  return doc;
+}
+
+/**
+ * Direct download helper for Inventory Stock PDF report
+ */
+export function exportInventoryStockReportPdf(
+  products: GreenMartProduct[],
+  options: StockPdfExportOptions = {}
+): void {
+  const doc = generateInventoryStockPdf(products, options);
+  const cleanCategory = (options.categoryFilter || 'semua').replace(/[^a-zA-Z0-9_-]/g, '_');
+  const filename = `Laporan_Stok_Barang_GreenMart_${cleanCategory}.pdf`;
+  doc.save(filename);
+}
+
+/**
+ * Direct print helper for Inventory Stock PDF report
+ */
+export function printInventoryStockReportPdf(
+  products: GreenMartProduct[],
+  options: StockPdfExportOptions = {}
+): void {
+  const doc = generateInventoryStockPdf(products, options);
+  doc.autoPrint();
+  const blobUrl = doc.output('bloburl');
+  window.open(blobUrl, '_blank');
+}
+
 

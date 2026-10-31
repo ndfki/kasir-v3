@@ -93,10 +93,11 @@ export const GreenMartReceiptModal: React.FC<GreenMartReceiptModalProps> = ({
         <style>
           @page { size: ${pageCss}; margin: 0; }
           body {
-            font-family: 'Courier New', Courier, monospace;
-            font-size: ${is80mm ? '12px' : '10px'};
+            font-family: 'JetBrains Mono', 'Courier New', Courier, monospace;
+            font-size: ${is80mm ? '12px' : '10.5px'};
             line-height: 1.35;
-            color: #000;
+            color: #000000;
+            font-weight: 700;
             width: ${paperWidthCss};
             margin: 0 auto;
             padding: ${is80mm ? '2mm 3mm' : '1.5mm 1.5mm'};
@@ -105,9 +106,9 @@ export const GreenMartReceiptModal: React.FC<GreenMartReceiptModalProps> = ({
           }
           .text-center { text-align: center; }
           .text-right { text-align: right; }
-          .bold { font-weight: bold; }
-          .line { border-top: 1px dashed #000; margin: 4px 0; }
-          .double-line { border-top: 2px dashed #000; margin: 5px 0; }
+          .bold { font-weight: 800; }
+          .line { border-top: 1.5px dashed #000000; margin: 4px 0; }
+          .double-line { border-top: 2px dashed #000000; margin: 5px 0; }
           .flex { display: flex; justify-content: space-between; align-items: flex-start; }
           .receipt-logo {
             display: block;
@@ -117,15 +118,15 @@ export const GreenMartReceiptModal: React.FC<GreenMartReceiptModalProps> = ({
             image-rendering: crisp-edges;
           }
           .settled-badge {
-            border: 1px solid #000;
+            border: 1.5px solid #000000;
             padding: 3px;
             text-align: center;
-            font-weight: bold;
+            font-weight: 800;
             margin: 4px 0;
-            font-size: 9.5px;
+            font-size: 10px;
           }
           @media print {
-            body { width: 100%; margin: 0; padding: ${is80mm ? '1.5mm' : '1mm'}; }
+            body { width: 100%; margin: 0; padding: ${is80mm ? '1.5mm' : '1mm'}; color: #000000; }
           }
         </style>
       </head>
@@ -133,15 +134,15 @@ export const GreenMartReceiptModal: React.FC<GreenMartReceiptModalProps> = ({
         <!-- Header Logo (Support B&W & Color) -->
         <div class="text-center" style="margin-bottom: 2px;">
           <img src="${GREENMART_LOGO_COLOR_BASE64}" alt="GreenMart Logo" class="receipt-logo" style="width: ${is80mm ? '40px' : '34px'}; height: ${is80mm ? '40px' : '34px'}; margin-bottom: 3px;" />
-          <div class="bold" style="font-size: ${is80mm ? '13px' : '11.5px'}; line-height: 1.2;">GREENMART SUPERMARKET</div>
-          <div style="font-size: ${is80mm ? '9px' : '8px'}; color: #333;">Pusat Belanja Segar &amp; Hemat Lengkap</div>
-          <div style="font-size: ${is80mm ? '8px' : '7.5px'}; color: #333; line-height: 1.25; margin-top: 2px;">${storeAddressFull}</div>
+          <div class="bold" style="font-size: ${is80mm ? '14px' : '13px'}; line-height: 1.2; letter-spacing: 0.5px;">GREENMART SUPERMARKET</div>
+          <div style="font-size: ${is80mm ? '10px' : '9px'}; font-weight: 700; color: #000; margin-top: 1px;">Pusat Belanja Segar &amp; Hemat Lengkap</div>
+          <div style="font-size: ${is80mm ? '9px' : '8.5px'}; font-weight: 600; color: #000; line-height: 1.25; margin-top: 2px;">${storeAddressFull}</div>
         </div>
         <div class="line"></div>
         <div class="flex"><span>Nota:</span><span class="bold">${transaction.invoiceNumber}</span></div>
         <div class="flex"><span>Waktu:</span><span>${transaction.date} ${transaction.time}</span></div>
-        <div class="flex"><span>Kasir:</span><span>${transaction.cashierName}</span></div>
-        <div class="flex"><span>Pelanggan:</span><span>${transaction.customerName}</span></div>
+        <div class="flex"><span>Kasir:</span><span class="bold">${transaction.cashierName}</span></div>
+        <div class="flex"><span>Pelanggan:</span><span class="bold">${transaction.customerName}</span></div>
         ${isSettled ? `
           <div class="settled-badge">
             *** BUKTI PELUNASAN PIUTANG RESMI ***<br/>
@@ -150,45 +151,45 @@ export const GreenMartReceiptModal: React.FC<GreenMartReceiptModalProps> = ({
         ` : ''}
         <div class="double-line"></div>
         ${transaction.items.map(item => `
-          <div>
-            <div class="bold">${item.name}</div>
-            <div class="flex">
+          <div style="margin-bottom: 3.5px;">
+            <div class="bold" style="font-size: ${is80mm ? '12px' : '11px'};">${item.name}</div>
+            <div class="flex" style="font-size: ${is80mm ? '11px' : '10px'}; font-weight: 700;">
               <span>  ${item.qty} ${item.unit} x Rp ${item.unitPrice.toLocaleString('id-ID')}</span>
               <span class="bold">Rp ${item.subtotal.toLocaleString('id-ID')}</span>
             </div>
-            ${item.discountPercent > 0 ? `<div class="flex" style="font-size: 9px; color: #333;"><span>  Diskon ${item.discountPercent}%</span><span>-</span></div>` : ''}
+            ${item.discountPercent > 0 ? `<div class="flex" style="font-size: 9px; font-weight: 700; color: #000;"><span>  Diskon ${item.discountPercent}%</span><span>-</span></div>` : ''}
           </div>
         `).join('')}
         <div class="line"></div>
         <div class="flex"><span>Total Item:</span><span>${transaction.totalItemsCount} Unit</span></div>
         <div class="flex"><span>Subtotal:</span><span>Rp ${transaction.subtotal.toLocaleString('id-ID')}</span></div>
-        ${transaction.discountTotal > 0 ? `<div class="flex"><span>Potongan Diskon:</span><span>-Rp ${transaction.discountTotal.toLocaleString('id-ID')}</span></div>` : ''}
+        ${transaction.discountTotal > 0 ? `<div class="flex" style="font-weight: 800; color: #000;"><span>Potongan Diskon:</span><span class="bold">-Rp ${transaction.discountTotal.toLocaleString('id-ID')}</span></div>` : ''}
         <div class="line"></div>
-        <div class="flex bold" style="font-size: 13px;">
+        <div class="flex bold" style="font-size: ${is80mm ? '14.5px' : '13px'}; padding: 2px 0;">
           <span>TOTAL BELANJA:</span>
           <span>Rp ${transaction.grandTotal.toLocaleString('id-ID')}</span>
         </div>
         <div class="line"></div>
-        <div class="flex"><span>Metode Bayar Awal:</span><span>${transaction.paymentMethod.toUpperCase()}</span></div>
+        <div class="flex"><span>Metode Bayar Awal:</span><span class="bold">${transaction.paymentMethod.toUpperCase()}</span></div>
         ${isSettled ? `
           <div class="flex"><span>Status Pembayaran:</span><span class="bold">LUNAS</span></div>
           <div class="flex"><span>Tgl Pelunasan:</span><span class="bold">${transaction.settledAt}</span></div>
           <div class="flex"><span>Metode Pelunasan:</span><span class="bold">${(transaction.settledMethod || 'tunai').toUpperCase()}</span></div>
           <div class="flex"><span>Uang Diterima:</span><span class="bold">Rp ${(transaction.settledAmount || transaction.grandTotal).toLocaleString('id-ID')}</span></div>
           <div class="flex bold"><span>SISA PIUTANG:</span><span>Rp 0 (LUNAS)</span></div>
-          ${transaction.settledNotes ? `<div class="flex"><span>Catatan:</span><span>${transaction.settledNotes}</span></div>` : ''}
-          ${transaction.settledByCashier ? `<div class="flex"><span>Kasir Pelunasan:</span><span>${transaction.settledByCashier}</span></div>` : ''}
+          ${transaction.settledNotes ? `<div class="flex" style="font-size: 9px; font-weight: 700;"><span>Catatan:</span><span>${transaction.settledNotes}</span></div>` : ''}
+          ${transaction.settledByCashier ? `<div class="flex" style="font-size: 9px; font-weight: 700;"><span>Kasir Pelunasan:</span><span>${transaction.settledByCashier}</span></div>` : ''}
         ` : `
           <div class="flex"><span>Bayar (Cash):</span><span class="bold">Rp ${transaction.cashGiven.toLocaleString('id-ID')}</span></div>
-          <div class="flex bold">
+          <div class="flex bold" style="font-size: 11.5px;">
             <span>${transaction.changeAmount >= 0 ? 'KEMBALIAN:' : 'SISA PIUTANG:'}</span>
             <span>Rp ${Math.abs(transaction.changeAmount).toLocaleString('id-ID')}</span>
           </div>
           <div class="flex"><span>Status:</span><span class="bold">${transaction.paymentStatus}</span></div>
         `}
         <div class="double-line"></div>
-        <div class="text-center bold" style="margin-top: 3px; font-size: ${is80mm ? '10px' : '9px'};">Terima Kasih Atas Kunjungan Anda!</div>
-        <div class="text-center" style="font-size: ${is80mm ? '8px' : '7.5px'}; color: #333;">Barang yang sudah dibeli dapat ditukar 1x24 jam dengan struk resmi</div>
+        <div class="text-center bold" style="margin-top: 3px; font-size: ${is80mm ? '11px' : '10px'};">Terima Kasih Atas Kunjungan Anda!</div>
+        <div class="text-center" style="font-size: ${is80mm ? '8.5px' : '8px'}; font-weight: 600; color: #000;">Barang yang sudah dibeli dapat ditukar 1x24 jam dengan struk resmi</div>
         
         <!-- Footer Logo GreenMart Resmi -->
         <div style="text-align: center; margin: 4px 0 2px 0;">
@@ -196,8 +197,8 @@ export const GreenMartReceiptModal: React.FC<GreenMartReceiptModalProps> = ({
         </div>
 
         <div class="text-center bold" style="font-size: ${is80mm ? '14px' : '12px'}; letter-spacing: 2px;">|||| || ||||| || |||||| |||| |</div>
-        <div class="text-center" style="font-size: 8px; color: #555;">*${transaction.invoiceNumber}*</div>
-        <div class="text-center" style="font-size: 7px; color: #555; margin-top: 2px;">Device: ${activePrinter.name} (${settings.paperWidth})</div>
+        <div class="text-center" style="font-size: 8.5px; font-weight: 700; color: #000;">*${transaction.invoiceNumber}*</div>
+        <div class="text-center" style="font-size: 7.5px; font-weight: 600; color: #000; margin-top: 2px;">Device: ${activePrinter.name} (${settings.paperWidth})</div>
         ${settings.autoCut ? '<div style="height: 14mm;"></div>' : '<div style="height: 6mm;"></div>'}
       </body>
       </html>
@@ -425,7 +426,7 @@ export const GreenMartReceiptModal: React.FC<GreenMartReceiptModalProps> = ({
 
           {/* Modal Body: Thermal Paper Preview */}
           <div className="flex-1 overflow-y-auto p-4 sm:p-5 bg-slate-100 dark:bg-slate-950">
-            <div className={`bg-white text-slate-900 p-5 rounded-2xl shadow-sm border border-slate-200 font-mono text-xs sm:text-sm space-y-3 mx-auto transition-all duration-200 ${
+            <div className={`bg-white text-black p-5 rounded-2xl shadow-sm border border-slate-300 font-mono text-xs sm:text-sm space-y-3 mx-auto transition-all duration-200 ${
               is80mm ? 'max-w-sm sm:max-w-md' : 'max-w-xs'
             }`}>
               
@@ -435,41 +436,44 @@ export const GreenMartReceiptModal: React.FC<GreenMartReceiptModalProps> = ({
                   alt="GreenMart Logo" 
                   className="w-10 h-10 mx-auto object-contain"
                 />
-                <div className="font-black text-sm sm:text-base tracking-wide">GREENMART SUPERMARKET</div>
-                <div className="text-xs text-slate-500">Pusat Belanja Segar &amp; Hemat Lengkap</div>
-                <div className="text-[11px] text-slate-600 font-medium leading-tight px-1">
-                  Jl. Ki Mangunsarkoro No.2, 03, Dracik Barat, Proyonanggan Sel., Kec. Batang, Kabupaten Batang, Jawa Tengah 51216
+                <div className="font-black text-sm sm:text-base tracking-wide text-black">GREENMART SUPERMARKET</div>
+                <div className="text-xs text-black font-bold">Pusat Belanja Segar &amp; Hemat Lengkap</div>
+                <div className="text-[11px] text-black font-semibold leading-snug px-1 max-w-[250px] mx-auto">
+                  Jl. Ki Mangunsarkoro No.2, 03, Dracik<br />
+                  Barat, Proyonanggan Sel., Kec.<br />
+                  Batang, Kabupaten Batang, Jawa Tengah<br />
+                  51216
                 </div>
               </div>
 
-              <div className="border-t border-dashed border-slate-300 pt-2 space-y-1 text-xs">
+              <div className="border-t-2 border-dashed border-black/80 pt-2 space-y-1 text-xs">
                 <div className="flex justify-between">
-                  <span className="text-slate-500">No. Nota:</span>
-                  <span className="font-bold">{transaction.invoiceNumber}</span>
+                  <span className="font-bold text-slate-800">No. Nota:</span>
+                  <span className="font-black text-black">{transaction.invoiceNumber}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Waktu:</span>
-                  <span>{transaction.date} {transaction.time}</span>
+                  <span className="font-bold text-slate-800">Waktu:</span>
+                  <span className="font-bold text-black">{transaction.date} {transaction.time}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Kasir:</span>
-                  <span>{transaction.cashierName}</span>
+                  <span className="font-bold text-slate-800">Kasir:</span>
+                  <span className="font-bold text-black">{transaction.cashierName}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Pelanggan:</span>
-                  <span className="font-semibold">{transaction.customerName}</span>
+                  <span className="font-bold text-slate-800">Pelanggan:</span>
+                  <span className="font-black text-black">{transaction.customerName}</span>
                 </div>
               </div>
 
               {/* Items Table */}
-              <div className="border-t border-dashed border-slate-300 pt-2 space-y-1.5 text-xs sm:text-sm">
+              <div className="border-t-2 border-dashed border-black/80 pt-2 space-y-1.5 text-xs sm:text-sm">
                 {transaction.items.map((item, idx) => (
                   <div key={idx} className="space-y-0.5">
-                    <div className="font-bold text-slate-900 flex justify-between">
+                    <div className="font-black text-black flex justify-between">
                       <span className="truncate max-w-[180px] sm:max-w-[240px]">{item.name}</span>
-                      <span>Rp {item.subtotal.toLocaleString('id-ID')}</span>
+                      <span className="font-mono">Rp {item.subtotal.toLocaleString('id-ID')}</span>
                     </div>
-                    <div className="text-xs text-slate-500 flex justify-between">
+                    <div className="text-xs font-bold text-slate-800 flex justify-between">
                       <span>{item.qty} {item.unit} &times; Rp {item.unitPrice.toLocaleString('id-ID')}</span>
                     </div>
                   </div>
@@ -477,17 +481,17 @@ export const GreenMartReceiptModal: React.FC<GreenMartReceiptModalProps> = ({
               </div>
 
               {/* Calculations Breakdown */}
-              <div className="border-t border-dashed border-slate-300 pt-2 space-y-1 text-xs">
-                <div className="flex justify-between text-slate-600">
+              <div className="border-t-2 border-dashed border-black/80 pt-2 space-y-1 text-xs">
+                <div className="flex justify-between font-bold text-slate-800">
                   <span>Total Item:</span>
-                  <span>{transaction.totalItemsCount} Unit</span>
+                  <span className="font-black text-black">{transaction.totalItemsCount} Unit</span>
                 </div>
-                <div className="flex justify-between text-slate-600">
+                <div className="flex justify-between font-bold text-slate-800">
                   <span>Subtotal:</span>
-                  <span>Rp {transaction.subtotal.toLocaleString('id-ID')}</span>
+                  <span className="font-black text-black">Rp {transaction.subtotal.toLocaleString('id-ID')}</span>
                 </div>
                 {transaction.discountTotal > 0 && (
-                  <div className="flex justify-between text-rose-600 font-bold">
+                  <div className="flex justify-between text-rose-700 font-black">
                     <span>Diskon:</span>
                     <span>-Rp {transaction.discountTotal.toLocaleString('id-ID')}</span>
                   </div>
@@ -495,83 +499,79 @@ export const GreenMartReceiptModal: React.FC<GreenMartReceiptModalProps> = ({
               </div>
 
               {/* Grand Total Box */}
-              <div className="border-y border-slate-800 py-2 flex justify-between items-center text-sm font-bold">
-                <span>TOTAL BELANJA:</span>
-                <span className="text-emerald-700 text-base sm:text-lg font-black font-mono">Rp {transaction.grandTotal.toLocaleString('id-ID')}</span>
+              <div className="border-y-2 border-black py-2.5 flex justify-between items-center text-sm font-black">
+                <span className="tracking-wide">TOTAL TAGIHAN:</span>
+                <span className="text-black text-base sm:text-lg font-black font-mono">Rp {transaction.grandTotal.toLocaleString('id-ID')}</span>
               </div>
 
               {/* Payment & Change Info */}
               {transaction.settledAt ? (
-                <div className="space-y-1.5 text-xs bg-emerald-50 dark:bg-emerald-950/40 p-2.5 rounded-xl border border-emerald-200 dark:border-emerald-800">
-                  <div className="text-center font-bold text-emerald-800 dark:text-emerald-300 pb-1 border-b border-dashed border-emerald-300">
+                <div className="space-y-1.5 text-xs bg-slate-50 p-2.5 rounded-xl border border-black/40">
+                  <div className="text-center font-black text-black pb-1 border-b border-dashed border-black/40">
                     BUKTI PELUNASAN PIUTANG RESMI
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-500">Status Akhir:</span>
-                    <span className="px-2 py-0.5 rounded font-black text-xs bg-emerald-600 text-white">
+                    <span className="font-bold text-slate-800">Status Akhir:</span>
+                    <span className="px-2 py-0.5 rounded font-black text-xs bg-black text-white">
                       LUNAS TERBAYAR
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-500">Waktu Pelunasan:</span>
-                    <span className="font-bold text-slate-800">{transaction.settledAt}</span>
+                    <span className="font-bold text-slate-800">Waktu Pelunasan:</span>
+                    <span className="font-black text-black">{transaction.settledAt}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-500">Metode Pelunasan:</span>
-                    <span className="font-bold uppercase text-slate-800">{transaction.settledMethod || 'Tunai'}</span>
+                    <span className="font-bold text-slate-800">Metode Pelunasan:</span>
+                    <span className="font-black uppercase text-black">{transaction.settledMethod || 'Tunai'}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-500">Nominal Dilunasi:</span>
-                    <span className="font-bold text-emerald-700">Rp {(transaction.settledAmount || transaction.grandTotal).toLocaleString('id-ID')}</span>
+                    <span className="font-bold text-slate-800">Nominal Dilunasi:</span>
+                    <span className="font-black text-black">Rp {(transaction.settledAmount || transaction.grandTotal).toLocaleString('id-ID')}</span>
                   </div>
-                  <div className="flex justify-between font-bold text-slate-900">
+                  <div className="flex justify-between font-black text-black">
                     <span>Sisa Piutang:</span>
-                    <span className="text-emerald-600 font-black">Rp 0 (LUNAS)</span>
+                    <span className="font-black">Rp 0 (LUNAS)</span>
                   </div>
                   {transaction.settledByCashier && (
-                    <div className="flex justify-between text-[11px] text-slate-500">
+                    <div className="flex justify-between text-[11px] font-bold text-slate-800">
                       <span>Kasir Pelunasan:</span>
-                      <span>{transaction.settledByCashier}</span>
+                      <span className="font-black text-black">{transaction.settledByCashier}</span>
                     </div>
                   )}
                   {transaction.settledNotes && (
-                    <div className="text-[11px] text-slate-600 italic pt-1 border-t border-emerald-200">
+                    <div className="text-[11px] text-slate-800 font-bold italic pt-1 border-t border-dashed border-black/40">
                       Ket: {transaction.settledNotes}
                     </div>
                   )}
                 </div>
               ) : (
                 <div className="space-y-1 text-xs">
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">Metode Bayar:</span>
-                    <span className="font-bold uppercase">{transaction.paymentMethod}</span>
+                  <div className="flex justify-between font-bold text-slate-800">
+                    <span>Metode Bayar:</span>
+                    <span className="font-black uppercase text-black">{transaction.paymentMethod}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">Bayar (Cash):</span>
-                    <span className="font-bold">Rp {transaction.cashGiven.toLocaleString('id-ID')}</span>
+                  <div className="flex justify-between font-bold text-slate-800">
+                    <span>Bayar (Cash):</span>
+                    <span className="font-black text-black">Rp {transaction.cashGiven.toLocaleString('id-ID')}</span>
                   </div>
-                  <div className="flex justify-between font-bold text-slate-900">
+                  <div className="flex justify-between font-black text-black">
                     <span>{transaction.changeAmount >= 0 ? 'Kembalian:' : 'Sisa Piutang:'}</span>
-                    <span className={transaction.changeAmount >= 0 ? 'text-emerald-600 font-bold' : 'text-rose-600 font-bold'}>
+                    <span className="font-black">
                       Rp {Math.abs(transaction.changeAmount).toLocaleString('id-ID')}
                     </span>
                   </div>
                   <div className="flex justify-between items-center pt-0.5">
-                    <span className="text-slate-500">Status:</span>
-                    <span className={`px-2 py-0.5 rounded font-bold text-xs ${
-                      transaction.paymentStatus === 'Lunas' 
-                        ? 'bg-emerald-100 text-emerald-800' 
-                        : 'bg-amber-100 text-amber-800'
-                    }`}>
+                    <span className="font-bold text-slate-800">Status:</span>
+                    <span className="px-2 py-0.5 rounded font-black text-xs border border-black bg-slate-100 text-black">
                       {transaction.paymentStatus}
                     </span>
                   </div>
                 </div>
               )}
 
-              <div className="border-t border-dashed border-slate-300 pt-2 text-center text-xs text-slate-500 space-y-1">
-                <div className="font-semibold text-slate-800 text-xs">Terima Kasih Atas Kunjungan Anda di GreenMart!</div>
-                <div className="text-[10px] text-slate-500">Barang yang sudah dibeli dapat ditukar 1x24 jam dengan struk resmi</div>
+              <div className="border-t-2 border-dashed border-black/80 pt-2 text-center text-xs space-y-1">
+                <div className="font-black text-black text-xs">Terima Kasih Atas Kunjungan Anda di GreenMart!</div>
+                <div className="text-[10px] text-slate-800 font-bold leading-tight">Barang yang sudah dibeli dapat ditukar 1x24 jam dengan struk resmi</div>
                 
                 {/* Logo GreenMart di Footer Struk */}
                 <div className="py-1">
@@ -582,9 +582,9 @@ export const GreenMartReceiptModal: React.FC<GreenMartReceiptModalProps> = ({
                   />
                 </div>
 
-                <div className="font-mono text-xs tracking-widest text-slate-700">|||| || ||||| || |||||| |||| |</div>
-                <div className="text-[10px] text-slate-400 font-mono">*{transaction.invoiceNumber}*</div>
-                <div className="text-[9px] text-slate-400">Format: {settings.paperWidth} &bull; GreenMart POS Batang</div>
+                <div className="font-mono text-xs tracking-widest font-black text-black">|||| || ||||| || |||||| |||| |</div>
+                <div className="text-[10px] font-black text-black font-mono">*{transaction.invoiceNumber}*</div>
+                <div className="text-[9.5px] font-bold text-slate-800">Format: {settings.paperWidth} &bull; GreenMart POS Batang</div>
               </div>
 
             </div>

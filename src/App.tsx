@@ -512,7 +512,11 @@ export default function App() {
       />
 
       {/* Main Content Area */}
-      <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-7 flex-1 w-full min-w-0 overflow-x-hidden">
+      <main className={`max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 w-full min-w-0 flex-1 flex flex-col ${
+        activeTab === 'cashier'
+          ? 'py-2 sm:py-2.5 lg:h-[calc(100vh-3.75rem)] lg:overflow-hidden'
+          : 'py-5 sm:py-7 overflow-x-hidden'
+      }`}>
         
         {activeTab === 'cashier' && (
           <GreenMartCashier
@@ -534,6 +538,8 @@ export default function App() {
             onDeleteProduct={handleDeleteProduct}
             onBulkDeleteProducts={handleBulkDeleteProducts}
             onRestock={handleRestock}
+            activeCashier={activeCashier}
+            onShowToast={showToast}
           />
         )}
 
@@ -595,7 +601,9 @@ export default function App() {
       />
 
       {/* Footer */}
-      <footer className="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-4 px-4 text-center text-xs text-slate-500 dark:text-slate-400">
+      <footer className={`border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-3 sm:py-4 px-4 text-center text-xs text-slate-500 dark:text-slate-400 ${
+        activeTab === 'cashier' ? 'hidden lg:hidden' : ''
+      }`}>
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <img 
@@ -604,7 +612,7 @@ export default function App() {
               className="w-5 h-5 object-contain" 
             />
             <span className="font-bold text-slate-900 dark:text-white">GreenMart</span>
-            <span>&bull; Sistem Kasir POS &amp; Rekap Statistik Harian PHP &amp; MySQL</span>
+            <span>&bull; Sistem Kasir POS &amp; Rekap Statistik Harian Terpadu</span>
           </div>
           <div className="flex items-center gap-3 text-[11px]">
             <button 
@@ -612,7 +620,7 @@ export default function App() {
               onClick={() => setIsDeployModalOpen(true)}
               className="text-emerald-600 dark:text-emerald-400 font-bold hover:underline"
             >
-              Download Source Code XAMPP/VirtualBox (.ZIP)
+              Cadangkan &amp; Unduh Berkas Sistem (.ZIP)
             </button>
             <span>&bull;</span>
             <button 

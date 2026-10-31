@@ -599,174 +599,174 @@ export function exportGreenMartReceiptPdf(
 
   // Header Title
   doc.setFont('courier', 'bold');
-  doc.setFontSize(isA4 ? 15 : is58mm ? 9.5 : 11.5);
+  doc.setFontSize(isA4 ? 15 : is58mm ? 11 : 12.5);
   doc.text('GREENMART SUPERMARKET', centerX, y, { align: 'center' });
-  y += isA4 ? 5 : 3.5;
+  y += isA4 ? 5 : 3.8;
 
-  doc.setFont('courier', 'normal');
-  doc.setFontSize(isA4 ? 9.5 : is58mm ? 6 : 7);
-  doc.text('Pusat Belanja Segar, Hemat & Lengkap', centerX, y, { align: 'center' });
-  y += isA4 ? 4 : 2.7;
-  doc.setFontSize(isA4 ? 8 : is58mm ? 5.2 : 6);
+  doc.setFont('courier', 'bold');
+  doc.setFontSize(isA4 ? 9.5 : is58mm ? 7.8 : 8.5);
+  doc.text('Pusat Belanja Segar & Hemat Lengkap', centerX, y, { align: 'center' });
+  y += isA4 ? 4 : 3;
+
+  doc.setFont('courier', 'bold');
+  doc.setFontSize(isA4 ? 8.5 : is58mm ? 7 : 7.5);
   doc.text('Jl. Ki Mangunsarkoro No.2, 03, Dracik Barat,', centerX, y, { align: 'center' });
-  y += isA4 ? 3.8 : 2.5;
+  y += isA4 ? 3.8 : 2.8;
   doc.text('Proyonanggan Sel., Kec. Batang, Batang 51216', centerX, y, { align: 'center' });
-  y += isA4 ? 4.5 : 3.2;
+  y += isA4 ? 4.5 : 3.5;
 
   const drawDashedLine = (currY: number) => {
     doc.setLineDashPattern([1.5, 1], 0);
-    doc.setLineWidth(0.2);
+    doc.setLineWidth(0.35);
     doc.line(marginX, currY, rightX, currY);
     doc.setLineDashPattern([], 0);
   };
 
   const drawDoubleLine = (currY: number) => {
     doc.setLineDashPattern([2, 1], 0);
-    doc.setLineWidth(0.25);
+    doc.setLineWidth(0.4);
     doc.line(marginX, currY, rightX, currY);
-    doc.line(marginX, currY + 0.8, rightX, currY + 0.8);
+    doc.line(marginX, currY + 0.9, rightX, currY + 0.9);
     doc.setLineDashPattern([], 0);
   };
 
   drawDashedLine(y);
-  y += isA4 ? 5 : 3.5;
+  y += isA4 ? 5 : 3.8;
 
   // Metadata
-  doc.setFontSize(isA4 ? 9.5 : is58mm ? 6.5 : 7.5);
+  doc.setFont('courier', 'bold');
+  doc.setFontSize(isA4 ? 9.5 : is58mm ? 7.6 : 8.5);
   doc.text(`Nota  : ${transaction.invoiceNumber}`, marginX, y);
-  y += isA4 ? 4.5 : 3.2;
+  y += isA4 ? 4.5 : 3.4;
   doc.text(`Waktu : ${transaction.date} ${transaction.time}`, marginX, y);
-  y += isA4 ? 4.5 : 3.2;
+  y += isA4 ? 4.5 : 3.4;
   doc.text(`Kasir : ${transaction.cashierName}`, marginX, y);
-  y += isA4 ? 4.5 : 3.2;
+  y += isA4 ? 4.5 : 3.4;
   doc.text(`Plg   : ${transaction.customerName || 'Umum'}`, marginX, y);
-  y += isA4 ? 5 : 3.8;
+  y += isA4 ? 5 : 4;
 
   if (transaction.settledAt) {
     // Settled official stamp box
-    doc.setLineWidth(0.25);
-    doc.rect(marginX, y, contentWidth, 8);
+    doc.setLineWidth(0.35);
+    doc.rect(marginX, y, contentWidth, 8.5);
     doc.setFont('courier', 'bold');
-    doc.setFontSize(isA4 ? 9 : 7);
-    doc.text('*** BUKTI PELUNASAN PIUTANG RESMI ***', centerX, y + 3.2, { align: 'center' });
-    doc.text('STATUS: LUNAS TERBAYAR', centerX, y + 6.4, { align: 'center' });
-    y += 11;
+    doc.setFontSize(isA4 ? 9.5 : 7.5);
+    doc.text('*** BUKTI PELUNASAN PIUTANG RESMI ***', centerX, y + 3.4, { align: 'center' });
+    doc.text('STATUS: LUNAS TERBAYAR', centerX, y + 6.8, { align: 'center' });
+    y += 11.5;
   }
 
   drawDoubleLine(y);
-  y += isA4 ? 6 : 4;
+  y += isA4 ? 6 : 4.2;
 
   // Items
   transaction.items.forEach(item => {
     doc.setFont('courier', 'bold');
-    doc.setFontSize(isA4 ? 9.5 : is58mm ? 6.8 : 7.8);
-    const maxChars = is58mm ? 22 : 32;
+    doc.setFontSize(isA4 ? 9.5 : is58mm ? 8.2 : 8.8);
+    const maxChars = is58mm ? 20 : 32;
     const displayName = item.name.length > maxChars ? item.name.substring(0, maxChars - 2) + '..' : item.name;
     doc.text(displayName, marginX, y);
-    y += isA4 ? 4 : 3;
+    y += isA4 ? 4 : 3.2;
 
-    doc.setFont('courier', 'normal');
-    doc.setFontSize(isA4 ? 9 : is58mm ? 6.5 : 7.2);
+    doc.setFont('courier', 'bold');
+    doc.setFontSize(isA4 ? 9 : is58mm ? 7.8 : 8.2);
     const qtyText = `  ${item.qty} ${item.unit} x Rp ${item.unitPrice.toLocaleString('id-ID')}`;
     const subtotalText = `Rp ${item.subtotal.toLocaleString('id-ID')}`;
     doc.text(qtyText, marginX, y);
-    doc.setFont('courier', 'bold');
     doc.text(subtotalText, rightX, y, { align: 'right' });
-    doc.setFont('courier', 'normal');
-    y += isA4 ? 4.5 : 3.4;
+    y += isA4 ? 4.5 : 3.6;
 
     if (item.discountPercent > 0) {
-      doc.setFontSize(is58mm ? 6 : 6.8);
+      doc.setFontSize(is58mm ? 7 : 7.5);
       doc.text(`  (Diskon ${item.discountPercent}%)`, marginX, y);
-      y += 2.8;
+      y += 3;
     }
   });
 
   drawDashedLine(y);
-  y += isA4 ? 5 : 3.5;
+  y += isA4 ? 5 : 3.8;
 
   // Totals
-  doc.setFontSize(isA4 ? 9.5 : is58mm ? 6.8 : 7.5);
+  doc.setFont('courier', 'bold');
+  doc.setFontSize(isA4 ? 9.5 : is58mm ? 7.8 : 8.5);
   doc.text(`Total Barang :`, marginX, y);
   doc.text(`${transaction.totalItemsCount} Unit`, rightX, y, { align: 'right' });
-  y += isA4 ? 4.5 : 3.2;
+  y += isA4 ? 4.5 : 3.4;
 
   doc.text(`Subtotal :`, marginX, y);
   doc.text(`Rp ${transaction.subtotal.toLocaleString('id-ID')}`, rightX, y, { align: 'right' });
-  y += isA4 ? 4.5 : 3.2;
+  y += isA4 ? 4.5 : 3.4;
 
   if (transaction.discountTotal > 0) {
     doc.text(`Potongan Diskon :`, marginX, y);
     doc.text(`-Rp ${transaction.discountTotal.toLocaleString('id-ID')}`, rightX, y, { align: 'right' });
-    y += isA4 ? 4.5 : 3.2;
+    y += isA4 ? 4.5 : 3.4;
   }
 
   drawDashedLine(y);
-  y += isA4 ? 5.5 : 4.2;
+  y += isA4 ? 5.5 : 4.4;
 
   // Grand total
   doc.setFont('courier', 'bold');
-  doc.setFontSize(isA4 ? 12 : is58mm ? 8.5 : 10);
+  doc.setFontSize(isA4 ? 13 : is58mm ? 11 : 12.5);
   doc.text(`TOTAL TAGIHAN :`, marginX, y);
   doc.text(`Rp ${transaction.grandTotal.toLocaleString('id-ID')}`, rightX, y, { align: 'right' });
-  y += isA4 ? 5.5 : 4.2;
+  y += isA4 ? 5.5 : 4.4;
 
   drawDashedLine(y);
-  y += isA4 ? 5 : 3.5;
+  y += isA4 ? 5 : 3.8;
 
-  doc.setFont('courier', 'normal');
-  doc.setFontSize(isA4 ? 9.5 : is58mm ? 6.8 : 7.5);
+  doc.setFont('courier', 'bold');
+  doc.setFontSize(isA4 ? 9.5 : is58mm ? 7.8 : 8.5);
 
   if (transaction.settledAt) {
     doc.text(`Metode Awal  : ${transaction.paymentMethod.toUpperCase()}`, marginX, y);
-    y += 3.2;
+    y += 3.4;
     doc.text(`Status       : LUNAS (Piutang Selesai)`, marginX, y);
-    y += 3.2;
+    y += 3.4;
     doc.text(`Tgl Lunas    : ${transaction.settledAt}`, marginX, y);
-    y += 3.2;
+    y += 3.4;
     doc.text(`Pelunasan    : ${(transaction.settledMethod || 'tunai').toUpperCase()}`, marginX, y);
-    y += 3.2;
+    y += 3.4;
     doc.text(`Jml Dilunasi : Rp ${(transaction.settledAmount || transaction.grandTotal).toLocaleString('id-ID')}`, marginX, y);
-    y += 3.2;
-    doc.setFont('courier', 'bold');
+    y += 3.4;
     doc.text(`Sisa Piutang : Rp 0 (LUNAS)`, marginX, y);
-    y += 3.8;
+    y += 4;
   } else {
     doc.text(`Metode Bayar : ${transaction.paymentMethod.toUpperCase()}`, marginX, y);
-    y += 3.2;
+    y += 3.4;
     doc.text(`Uang Diterima: Rp ${transaction.cashGiven.toLocaleString('id-ID')}`, marginX, y);
-    y += 3.2;
-    doc.setFont('courier', 'bold');
+    y += 3.4;
     const changeLabel = transaction.changeAmount >= 0 ? 'Kembalian    :' : 'Sisa Piutang :';
     doc.text(changeLabel, marginX, y);
     doc.text(`Rp ${Math.abs(transaction.changeAmount).toLocaleString('id-ID')}`, rightX, y, { align: 'right' });
-    y += 3.5;
-    doc.setFont('courier', 'normal');
+    y += 3.6;
     doc.text(`Status       : ${transaction.paymentStatus}`, marginX, y);
-    y += 3.5;
+    y += 3.6;
   }
 
   if (transaction.notes) {
     y += 1;
     doc.text(`Catatan: ${transaction.notes}`, marginX, y);
-    y += 3.5;
+    y += 3.6;
   }
 
   drawDoubleLine(y);
-  y += isA4 ? 6 : 4.5;
+  y += isA4 ? 6 : 4.6;
 
   // Footer
   doc.setFont('courier', 'bold');
-  doc.setFontSize(isA4 ? 9.5 : is58mm ? 6.8 : 7.5);
+  doc.setFontSize(isA4 ? 9.5 : is58mm ? 7.8 : 8.5);
   doc.text('Terima Kasih Atas Kunjungan Anda!', centerX, y, { align: 'center' });
-  y += isA4 ? 4.5 : 3.2;
-  doc.setFont('courier', 'normal');
-  doc.setFontSize(isA4 ? 8 : is58mm ? 5.5 : 6.2);
+  y += isA4 ? 4.5 : 3.4;
+
+  doc.setFont('courier', 'bold');
+  doc.setFontSize(isA4 ? 8 : is58mm ? 6.5 : 7.2);
   doc.text('Barang yang dibeli dapat ditukar 1x24 jam dengan struk', centerX, y, { align: 'center' });
-  y += isA4 ? 4 : 3;
+  y += isA4 ? 4 : 3.2;
 
   // Footer Logo GreenMart
-  const footerLogoSize = isA4 ? 12 : is58mm ? 7 : 8.5;
+  const footerLogoSize = isA4 ? 12 : is58mm ? 7.5 : 9;
   try {
     doc.addImage(logoData, 'PNG', centerX - (footerLogoSize / 2), y, footerLogoSize, footerLogoSize);
     y += footerLogoSize + 2.5;
@@ -776,7 +776,7 @@ export function exportGreenMartReceiptPdf(
 
   // Simulated barcode text
   doc.setFont('courier', 'bold');
-  doc.setFontSize(isA4 ? 12 : 9);
+  doc.setFontSize(isA4 ? 13 : is58mm ? 10.5 : 12);
   doc.text('|||| || ||||| || |||||| |||| |', centerX, y, { align: 'center' });
   y += isA4 ? 4 : 2.8;
   doc.setFont('courier', 'normal');
@@ -994,10 +994,11 @@ export function generateGreenMartReceiptStandaloneHtml(
 
     /* 58mm default width */
     .receipt-paper.paper-58mm {
-      width: 54mm;
-      max-width: 54mm;
-      padding: 12px 9px;
+      width: 52mm;
+      max-width: 52mm;
+      padding: 10px 6px;
       font-size: 10.5px;
+      font-weight: 700;
     }
     /* 80mm width */
     .receipt-paper.paper-80mm {
@@ -1005,6 +1006,7 @@ export function generateGreenMartReceiptStandaloneHtml(
       max-width: 76mm;
       padding: 16px 14px;
       font-size: 12px;
+      font-weight: 700;
     }
 
     /* Zigzag paper edges simulation */
@@ -1027,9 +1029,9 @@ export function generateGreenMartReceiptStandaloneHtml(
 
     .text-center { text-align: center; }
     .text-right { text-align: right; }
-    .bold { font-weight: 700; }
-    .line { border-top: 1px dashed #000; margin: 5px 0; }
-    .double-line { border-top: 2px dashed #000; margin: 6px 0; }
+    .bold { font-weight: 800; }
+    .line { border-top: 1.5px dashed #000; margin: 4px 0; }
+    .double-line { border-top: 2px dashed #000; margin: 5px 0; }
     .flex { display: flex; justify-content: space-between; align-items: flex-start; }
 
     /* LOGO STYLING - Color & B&W High-Contrast */
@@ -1090,56 +1092,53 @@ export function generateGreenMartReceiptStandaloneHtml(
     }
 
     .item-block {
-      margin-bottom: 4px;
+      margin-bottom: 3.5px;
     }
     .item-name {
-      font-weight: 700;
+      font-weight: 800;
       word-break: break-word;
       line-height: 1.25;
-    }
-    .paper-58mm .item-name {
-      font-size: 10px;
+      font-size: 11px;
     }
     .paper-80mm .item-name {
-      font-size: 11.5px;
+      font-size: 12px;
     }
 
     .item-calc {
       display: flex;
       justify-content: space-between;
-      color: #222;
-      font-size: 9.5px;
+      color: #000000;
+      font-size: 10.5px;
+      font-weight: 700;
     }
     .paper-80mm .item-calc {
-      font-size: 10.5px;
+      font-size: 11px;
     }
 
     .total-container {
-      border-top: 1.5px solid #000;
-      border-bottom: 1.5px solid #000;
-      padding: 4px 0;
+      border-top: 1.5px solid #000000;
+      border-bottom: 1.5px solid #000000;
+      padding: 3px 0;
       margin: 4px 0;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-weight: 800;
-    }
-    .paper-58mm .total-container {
-      font-size: 12px;
+      font-weight: 900;
+      font-size: 13.5px;
     }
     .paper-80mm .total-container {
-      font-size: 14px;
+      font-size: 15px;
     }
 
     .barcode-display {
-      font-size: 15px;
+      font-size: 14px;
       letter-spacing: 2px;
-      font-weight: 700;
-      margin: 5px 0 2px 0;
+      font-weight: 800;
+      margin: 4px 0 2px 0;
       text-align: center;
     }
     .paper-58mm .barcode-display {
-      font-size: 13px;
+      font-size: 12.5px;
       letter-spacing: 1.5px;
     }
 
@@ -1152,7 +1151,7 @@ export function generateGreenMartReceiptStandaloneHtml(
         background: #ffffff !important;
         padding: 0 !important;
         margin: 0 !important;
-        color: #000 !important;
+        color: #000000 !important;
       }
       .top-bar {
         display: none !important;
@@ -1169,16 +1168,20 @@ export function generateGreenMartReceiptStandaloneHtml(
         margin: 0 auto !important;
       }
       .receipt-paper.paper-58mm {
-        width: 52mm !important;
-        max-width: 52mm !important;
-        padding: 1.5mm 1.5mm !important;
-        font-size: 10px !important;
+        width: 50mm !important;
+        max-width: 50mm !important;
+        padding: 1mm 1.5mm !important;
+        font-size: 10.5px !important;
+        font-weight: 700 !important;
+        color: #000000 !important;
       }
       .receipt-paper.paper-80mm {
         width: 74mm !important;
         max-width: 74mm !important;
         padding: 2mm 3mm !important;
-        font-size: 11.5px !important;
+        font-size: 12px !important;
+        font-weight: 700 !important;
+        color: #000000 !important;
       }
       .receipt-paper::before, .receipt-paper::after {
         display: none !important;
@@ -1276,9 +1279,9 @@ export function generateGreenMartReceiptStandaloneHtml(
           alt="GreenMart Logo" 
           class="receipt-logo header-logo"
         />
-        <div class="bold" style="font-size: 13px; letter-spacing: 0.5px; line-height: 1.2;">GREENMART SUPERMARKET</div>
-        <div style="font-size: 9px; color: #444; margin-top: 1px;">Pusat Belanja Segar &amp; Hemat Lengkap</div>
-        <div style="font-size: 8px; color: #333; line-height: 1.25; margin-top: 2px; padding: 0 2px;">
+        <div class="bold" style="font-size: 14px; letter-spacing: 0.5px; line-height: 1.2;">GREENMART SUPERMARKET</div>
+        <div style="font-size: 10px; font-weight: 700; color: #000; margin-top: 1px;">Pusat Belanja Segar &amp; Hemat Lengkap</div>
+        <div style="font-size: 9px; font-weight: 600; color: #000; line-height: 1.25; margin-top: 2px; padding: 0 1px;">
           ${storeAddressFormatted}
         </div>
       </div>
@@ -1288,7 +1291,7 @@ export function generateGreenMartReceiptStandaloneHtml(
       <!-- 2. METADATA TRANSAKSI -->
       <div class="flex"><span>No. Nota:</span><span class="bold">${transaction.invoiceNumber}</span></div>
       <div class="flex"><span>Waktu:</span><span>${transaction.date} ${transaction.time}</span></div>
-      <div class="flex"><span>Kasir:</span><span>${transaction.cashierName}</span></div>
+      <div class="flex"><span>Kasir:</span><span class="bold">${transaction.cashierName}</span></div>
       <div class="flex"><span>Pelanggan:</span><span class="bold">${transaction.customerName || 'Umum'}</span></div>
 
       ${isSettled ? `
@@ -1310,7 +1313,7 @@ export function generateGreenMartReceiptStandaloneHtml(
               <span class="bold">Rp ${item.subtotal.toLocaleString('id-ID')}</span>
             </div>
             ${item.discountPercent > 0 ? `
-              <div class="flex" style="font-size: 8.5px; color: #555; padding-left: 8px;">
+              <div class="flex" style="font-size: 9px; font-weight: 700; color: #000; padding-left: 8px;">
                 <span>Diskon Item (${item.discountPercent}%):</span>
                 <span>-</span>
               </div>
@@ -1325,7 +1328,7 @@ export function generateGreenMartReceiptStandaloneHtml(
       <div class="flex"><span>Total Barang:</span><span>${transaction.totalItemsCount} Unit</span></div>
       <div class="flex"><span>Subtotal:</span><span>Rp ${transaction.subtotal.toLocaleString('id-ID')}</span></div>
       ${transaction.discountTotal > 0 ? `
-        <div class="flex" style="color: #b91c1c;"><span>Potongan Diskon:</span><span class="bold">-Rp ${transaction.discountTotal.toLocaleString('id-ID')}</span></div>
+        <div class="flex" style="font-weight: 800; color: #000;"><span>Potongan Diskon:</span><span class="bold">-Rp ${transaction.discountTotal.toLocaleString('id-ID')}</span></div>
       ` : ''}
 
       <!-- TOTAL BELANJA CONTAINER -->
@@ -1343,11 +1346,11 @@ export function generateGreenMartReceiptStandaloneHtml(
         <div class="flex"><span>Metode Pelunasan:</span><span class="bold">${(transaction.settledMethod || 'tunai').toUpperCase()}</span></div>
         <div class="flex"><span>Uang Diterima:</span><span class="bold">Rp ${(transaction.settledAmount || transaction.grandTotal).toLocaleString('id-ID')}</span></div>
         <div class="flex bold"><span>SISA PIUTANG:</span><span>Rp 0 (LUNAS)</span></div>
-        ${transaction.settledNotes ? `<div class="flex" style="font-size: 9px;"><span>Catatan:</span><span>${transaction.settledNotes}</span></div>` : ''}
-        ${transaction.settledByCashier ? `<div class="flex" style="font-size: 9px;"><span>Kasir Pelunasan:</span><span>${transaction.settledByCashier}</span></div>` : ''}
+        ${transaction.settledNotes ? `<div class="flex" style="font-size: 9px; font-weight: 700; color: #000;"><span>Catatan:</span><span>${transaction.settledNotes}</span></div>` : ''}
+        ${transaction.settledByCashier ? `<div class="flex" style="font-size: 9px; font-weight: 700; color: #000;"><span>Kasir Pelunasan:</span><span>${transaction.settledByCashier}</span></div>` : ''}
       ` : `
         <div class="flex"><span>Bayar (Cash):</span><span class="bold">Rp ${transaction.cashGiven.toLocaleString('id-ID')}</span></div>
-        <div class="flex bold" style="font-size: 11px;">
+        <div class="flex bold" style="font-size: 11.5px;">
           <span>${transaction.changeAmount >= 0 ? 'KEMBALIAN:' : 'SISA PIUTANG:'}</span>
           <span>Rp ${Math.abs(transaction.changeAmount).toLocaleString('id-ID')}</span>
         </div>
@@ -1356,16 +1359,16 @@ export function generateGreenMartReceiptStandaloneHtml(
 
       ${transaction.notes ? `
         <div class="line"></div>
-        <div style="font-size: 9.5px; color: #444;">Catatan: ${transaction.notes}</div>
+        <div style="font-size: 9.5px; font-weight: 600; color: #000;">Catatan: ${transaction.notes}</div>
       ` : ''}
 
       <div class="double-line"></div>
       
-      <!-- 6. FOOTER STRUK DENGAN LOGO GREENMART (SESUAI REQUEST USER) -->
-      <div class="text-center bold" style="margin-top: 3px; font-size: 9.5px;">
+      <!-- 6. FOOTER STRUK DENGAN LOGO GREENMART -->
+      <div class="text-center bold" style="margin-top: 3px; font-size: 10.5px;">
         Terima Kasih Atas Kunjungan Anda!
       </div>
-      <div class="text-center" style="font-size: 8px; color: #444; line-height: 1.25; margin-top: 2px;">
+      <div class="text-center" style="font-size: 8.5px; font-weight: 600; color: #000; line-height: 1.25; margin-top: 2px;">
         Barang yang sudah dibeli dapat ditukar 1x24 jam dengan struk resmi
       </div>
       
@@ -1381,8 +1384,8 @@ export function generateGreenMartReceiptStandaloneHtml(
 
       <!-- BARCODE DISPLAY -->
       <div class="barcode-display">|||| || ||||| || |||||| |||| |</div>
-      <div class="text-center" style="font-size: 8px; color: #555;">*${transaction.invoiceNumber}*</div>
-      <div class="text-center" style="font-size: 7.5px; color: #777; margin-top: 2px;">
+      <div class="text-center" style="font-size: 8.5px; font-weight: 700; color: #000;">*${transaction.invoiceNumber}*</div>
+      <div class="text-center" style="font-size: 8px; font-weight: 600; color: #000; margin-top: 2px;">
         Format: <span id="label-active-width">${initialWidth}</span> &bull; GreenMart POS Batang
       </div>
 

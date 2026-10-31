@@ -1,4 +1,5 @@
 import { GreenMartTransaction } from '../types';
+import { GREENMART_LOGO_COLOR_BASE64 } from './greenmartLogoBase64';
 
 export type PrinterConnectionType = 'system' | 'usb' | 'bluetooth' | 'serial' | 'network';
 
@@ -415,9 +416,10 @@ export function generateThermalReceiptHtml(
   isAutoPrint: boolean = false
 ): string {
   const is80mm = settings.paperWidth === '80mm';
-  const paperWidthCss = is80mm ? '74mm' : '54mm';
+  const paperWidthCss = is80mm ? '74mm' : '52mm';
   const pageCss = is80mm ? '80mm auto' : '58mm auto';
   const isSettled = Boolean(transaction.settledAt);
+  const storeAddressFull = 'Jl. Ki Mangunsarkoro No.2, 03, Dracik Barat, Proyonanggan Sel., Kec. Batang, Kabupaten Batang, Jawa Tengah 51216';
 
   return `
     <!DOCTYPE html>
@@ -426,52 +428,67 @@ export function generateThermalReceiptHtml(
       <meta charset="utf-8">
       <title>Struk GreenMart - ${transaction.invoiceNumber}</title>
       <style>
-        @page { size: ${pageCss}; margin: 2mm; }
+        @page { size: ${pageCss}; margin: 0; }
         body {
-          font-family: 'Courier New', Courier, monospace;
-          font-size: ${is80mm ? '12px' : '11px'};
+          font-family: 'JetBrains Mono', 'Courier New', Courier, monospace;
+          font-size: ${is80mm ? '12px' : '10.5px'};
           line-height: 1.35;
-          color: #000;
+          color: #000000;
+          font-weight: 700;
           width: ${paperWidthCss};
           margin: 0 auto;
-          padding: 2mm;
+          padding: ${is80mm ? '2mm 3mm' : '1.5mm 1.5mm'};
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
         }
         .text-center { text-align: center; }
         .text-right { text-align: right; }
-        .bold { font-weight: bold; }
-        .line { border-top: 1px dashed #000; margin: 4px 0; }
-        .double-line { border-top: 2px dashed #000; margin: 5px 0; }
-        .flex { display: flex; justify-content: space-between; }
+        .bold { font-weight: 800; }
+        .line { border-top: 1.5px dashed #000000; margin: 4px 0; }
+        .double-line { border-top: 2px dashed #000000; margin: 5px 0; }
+        .flex { display: flex; justify-content: space-between; align-items: flex-start; }
+        .receipt-logo {
+          display: block;
+          margin: 0 auto;
+          object-fit: contain;
+          image-rendering: -webkit-optimize-contrast;
+          image-rendering: crisp-edges;
+        }
         .settled-badge {
-          border: 1px solid #000;
+          border: 1.5px solid #000000;
           padding: 3px;
           text-align: center;
-          font-weight: bold;
+          font-weight: 800;
           margin: 4px 0;
           font-size: 10px;
         }
         .auto-tag {
-          font-size: 8px;
+          font-size: 8.5px;
           text-align: center;
           margin-bottom: 2px;
-          font-style: italic;
+          font-weight: 700;
         }
         @media print {
-          body { width: 100%; margin: 0; padding: 0; }
+          body { width: 100%; margin: 0; padding: ${is80mm ? '1.5mm' : '1mm'}; color: #000000; }
         }
       </style>
     </head>
     <body>
       ${isAutoPrint ? '<div class="auto-tag">[CETAK OTOMATIS SISTEM KASIR]</div>' : ''}
-      <div class="text-center bold" style="font-size: 13px;">GREENMART SUPERMARKET</div>
-      <div class="text-center" style="font-size: 9px;">Koperasi &amp; Lab Praktik Transaksi Sekolah</div>
-      <div class="text-center" style="font-size: 8px;">Jl. Raya Utama No. 88 &bull; Telp: (021) 7890-1234</div>
+      <div class="text-center" style="margin-bottom: 3px;">
+        ${settings.showLogo !== false ? `
+          <img src="${GREENMART_LOGO_COLOR_BASE64}" alt="GreenMart Logo" class="receipt-logo" style="width: ${is80mm ? '40px' : '34px'}; height: ${is80mm ? '40px' : '34px'}; margin-bottom: 3px;" />
+        ` : ''}
+        <div class="bold" style="font-size: ${is80mm ? '14.5px' : '13px'}; line-height: 1.2; letter-spacing: 0.5px;">GREENMART SUPERMARKET</div>
+        <div style="font-size: ${is80mm ? '10px' : '9px'}; font-weight: 700; margin-top: 1px;">Pusat Belanja Segar &amp; Hemat Lengkap</div>
+        <div style="font-size: ${is80mm ? '9px' : '8.5px'}; font-weight: 600; line-height: 1.25; margin-top: 2px;">${storeAddressFull}</div>
+      </div>
       <div class="line"></div>
       <div class="flex"><span>No. Nota:</span><span class="bold">${transaction.invoiceNumber}</span></div>
       <div class="flex"><span>Waktu:</span><span>${transaction.date} ${transaction.time}</span></div>
       <div class="flex"><span>Kasir:</span><span class="bold">${transaction.cashierName}</span></div>
-      <div class="flex"><span>Pelanggan:</span><span>${transaction.customerName}</span></div>
-      ${transaction.customerPhone ? `<div class="flex"><span>No. HP/WA:</span><span>${transaction.customerPhone}</span></div>` : ''}
+      <div class="flex"><span>Pelanggan:</span><span class="bold">${transaction.customerName}</span></div>
+      ${transaction.customerPhone ? `<div class="flex"><span>Kontak/WA:</span><span>${transaction.customerPhone}</span></div>` : ''}
       ${isSettled ? `
         <div class="settled-badge">
           *** BUKTI PELUNASAN PIUTANG RESMI ***<br/>
@@ -481,12 +498,12 @@ export function generateThermalReceiptHtml(
       <div class="double-line"></div>
       ${transaction.items.map(item => `
         <div style="margin-bottom: 3px;">
-          <div class="bold">${item.name}</div>
-          <div class="flex">
+          <div class="bold" style="font-size: ${is80mm ? '12px' : '11px'};">${item.name}</div>
+          <div class="flex" style="font-size: ${is80mm ? '11px' : '10px'}; font-weight: 700;">
             <span>  ${item.qty} ${item.unit} x Rp ${item.unitPrice.toLocaleString('id-ID')}</span>
             <span class="bold">Rp ${item.subtotal.toLocaleString('id-ID')}</span>
           </div>
-          ${item.discountPercent > 0 ? `<div class="flex" style="font-size: 9px; color: #333;"><span>  Potongan Diskon (${item.discountPercent}%)</span><span>-Rp ${Math.round(item.unitPrice * item.qty * item.discountPercent / 100).toLocaleString('id-ID')}</span></div>` : ''}
+          ${item.discountPercent > 0 ? `<div class="flex" style="font-size: 9px; font-weight: 700;"><span>  Potongan Diskon (${item.discountPercent}%)</span><span>-Rp ${Math.round(item.unitPrice * item.qty * item.discountPercent / 100).toLocaleString('id-ID')}</span></div>` : ''}
         </div>
       `).join('')}
       <div class="line"></div>
@@ -494,7 +511,7 @@ export function generateThermalReceiptHtml(
       <div class="flex"><span>Subtotal:</span><span>Rp ${transaction.subtotal.toLocaleString('id-ID')}</span></div>
       ${transaction.discountTotal > 0 ? `<div class="flex"><span>Total Potongan:</span><span>-Rp ${transaction.discountTotal.toLocaleString('id-ID')}</span></div>` : ''}
       <div class="line"></div>
-      <div class="flex bold" style="font-size: 13px;">
+      <div class="flex bold" style="font-size: ${is80mm ? '14.5px' : '13px'}; padding: 2px 0;">
         <span>TOTAL BELANJA:</span>
         <span>Rp ${transaction.grandTotal.toLocaleString('id-ID')}</span>
       </div>
@@ -516,10 +533,18 @@ export function generateThermalReceiptHtml(
         <div class="flex"><span>Status:</span><span class="bold">${transaction.paymentStatus}</span></div>
       `}
       <div class="double-line"></div>
-      <div class="text-center bold" style="margin-top: 3px;">Terima Kasih Atas Kunjungan Anda!</div>
-      <div class="text-center" style="font-size: 8px;">${settings.customFooterText || 'Simpan struk ini sebagai bukti pembayaran sah'}</div>
-      <div class="text-center" style="font-size: 7px; color: #555; margin-top: 2px;">Cetak: ${settings.paperWidth} &bull; GreenMart POS Engine</div>
-      ${settings.autoCut ? '<div style="height: 18mm;"></div>' : '<div style="height: 8mm;"></div>'}
+      <div class="text-center bold" style="margin-top: 3px; font-size: ${is80mm ? '11px' : '10px'};">Terima Kasih Atas Kunjungan Anda!</div>
+      <div class="text-center" style="font-size: ${is80mm ? '9px' : '8px'}; font-weight: 600;">${settings.customFooterText || 'Barang yang dibeli dapat ditukar 1x24 jam dengan struk'}</div>
+      
+      <!-- Footer Logo GreenMart -->
+      <div style="text-align: center; margin: 4px 0 2px 0;">
+        <img src="${GREENMART_LOGO_COLOR_BASE64}" alt="GreenMart Footer" class="receipt-logo" style="width: ${is80mm ? '28px' : '22px'}; height: ${is80mm ? '28px' : '22px'};" />
+      </div>
+
+      <div class="text-center bold" style="font-size: ${is80mm ? '14px' : '12px'}; letter-spacing: 2px;">|||| || ||||| || |||||| |||| |</div>
+      <div class="text-center" style="font-size: 8px; font-weight: 700; color: #000;">*${transaction.invoiceNumber}*</div>
+      <div class="text-center" style="font-size: 7.5px; font-weight: 600; color: #000; margin-top: 2px;">Cetak: ${settings.paperWidth} &bull; GreenMart POS Batang</div>
+      ${settings.autoCut ? '<div style="height: 14mm;"></div>' : '<div style="height: 6mm;"></div>'}
     </body>
     </html>
   `;

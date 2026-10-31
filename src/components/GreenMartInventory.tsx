@@ -10,11 +10,13 @@ import {
   Barcode, 
   X, 
   Save, 
-  Layers
+  Layers,
+  FileDown
 } from 'lucide-react';
-import { GreenMartProduct } from '../types';
+import { GreenMartProduct, CashierProfile } from '../types';
 import { GREENMART_CATEGORIES } from '../data/greenmartData';
 import { GreenMartConfirmModal } from './GreenMartConfirmModal';
+import { GreenMartExportStockPdfModal } from './GreenMartExportStockPdfModal';
 
 interface GreenMartInventoryProps {
   products: GreenMartProduct[];
@@ -23,6 +25,8 @@ interface GreenMartInventoryProps {
   onDeleteProduct: (productId: string) => void;
   onBulkDeleteProducts?: (productIds: string[]) => void;
   onRestock: (productId: string, quantity: number) => void;
+  activeCashier?: CashierProfile;
+  onShowToast?: (message: string, type?: 'success' | 'error' | 'info') => void;
 }
 
 export const GreenMartInventory: React.FC<GreenMartInventoryProps> = ({
@@ -31,7 +35,9 @@ export const GreenMartInventory: React.FC<GreenMartInventoryProps> = ({
   onUpdateProduct,
   onDeleteProduct,
   onBulkDeleteProducts,
-  onRestock
+  onRestock,
+  activeCashier,
+  onShowToast
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('Semua');
@@ -43,6 +49,7 @@ export const GreenMartInventory: React.FC<GreenMartInventoryProps> = ({
 
   // Modals state
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
+  const [isExportStockPdfModalOpen, setIsExportStockPdfModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<GreenMartProduct | null>(null);
   const [productToDelete, setProductToDelete] = useState<GreenMartProduct | null>(null);
 
@@ -337,11 +344,22 @@ export const GreenMartInventory: React.FC<GreenMartInventoryProps> = ({
             </button>
           </div>
 
+          {/* Export Stock PDF with Personalization Button */}
+          <button
+            type="button"
+            onClick={() => setIsExportStockPdfModalOpen(true)}
+            className="px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-xs sm:text-sm shadow-sm transition flex items-center gap-1.5 cursor-pointer shrink-0"
+            title="Ekspor Laporan Resmi Stok & Valuasi Aset ke PDF (A4)"
+          >
+            <FileDown className="w-4 h-4" />
+            <span>Ekspor PDF</span>
+          </button>
+
           {/* Add Product Button */}
           <button
             type="button"
             onClick={openAddModal}
-            className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm shadow-sm transition flex items-center gap-2 cursor-pointer shrink-0"
+            className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm shadow-sm transition flex items-center gap-2 cursor-pointer shrink-0"
           >
             <Plus className="w-4 h-4" />
             <span>Tambah Barang</span>
@@ -806,6 +824,17 @@ export const GreenMartInventory: React.FC<GreenMartInventoryProps> = ({
         variant="danger"
         onConfirm={handleConfirmBulkDelete}
         onCancel={() => setIsBulkDeleteConfirmOpen(false)}
+      />
+
+      {/* EXPORT INVENTORY STOCK TO PDF WITH PERSONALIZATION MODAL */}
+      <GreenMartExportStockPdfModal
+        isOpen={isExportStockPdfModalOpen}
+        onClose={() => setIsExportStockPdfModalOpen(false)}
+        products={products}
+        activeCategory={selectedCategory}
+        activeStockFilter={stockFilter}
+        activeCashier={activeCashier}
+        onShowToast={onShowToast}
       />
 
     </div>
