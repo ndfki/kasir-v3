@@ -62,24 +62,31 @@ export const LiveClock: React.FC<LiveClockProps> = ({
     timezoneOffset === 9 ? 'WIT' :
     'WIB';
 
-  // Determine period (Pagi, Siang, Sore, Malam)
+  // Operational hours logic: GreenMart operates strictly 07:00 - 15:30 WIB
   const currentHour = now.getHours();
+  const currentMinute = now.getMinutes();
+  const timeInMinutes = currentHour * 60 + currentMinute;
+  const openMinutes = 7 * 60; // 07:00 WIB
+  const closeMinutes = 15 * 60 + 30; // 15:30 WIB
+  const isStoreOpen = timeInMinutes >= openMinutes && timeInMinutes <= closeMinutes;
+
+  // Determine period based on operational schedule (07:00 - 15:30 WIB)
   const timePeriod = 
-    currentHour >= 4 && currentHour < 11 ? 'Pagi' :
-    currentHour >= 11 && currentHour < 15 ? 'Siang' :
-    currentHour >= 15 && currentHour < 18 ? 'Sore' :
-    'Malam';
+    timeInMinutes < openMinutes ? 'Sebelum Buka' :
+    timeInMinutes <= 11 * 60 + 30 ? 'Pagi (Shift 1)' :
+    timeInMinutes <= closeMinutes ? 'Siang (Shift 2)' :
+    'Tutup Operasional';
 
   // 1. Compact Variant (Great for mobile header or small bars)
   if (variant === 'compact') {
     return (
       <div 
         className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 text-slate-800 dark:text-slate-200 font-mono text-xs ${className}`}
-        title={`Waktu Sistem Real-Time: ${dayName}, ${fullDateFormatted} ${hours}:${minutes}:${seconds} ${timezoneName}`}
+        title={`Waktu Sistem Real-Time: ${dayName}, ${fullDateFormatted} ${hours}:${minutes}:${seconds} ${timezoneName} (Jam Operasional: 07:00 - 15:30 WIB)`}
       >
         <span className="relative flex h-2 w-2">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${isStoreOpen ? 'bg-emerald-400' : 'bg-amber-400'}`}></span>
+          <span className={`relative inline-flex rounded-full h-2 w-2 ${isStoreOpen ? 'bg-emerald-500' : 'bg-amber-500'}`}></span>
         </span>
         <span className="font-bold tabular-nums">{hours}</span>
         <span className={`transition-opacity duration-200 ${tick ? 'opacity-100' : 'opacity-30'} text-emerald-600 dark:text-emerald-400 font-bold`}>:</span>
@@ -100,7 +107,7 @@ export const LiveClock: React.FC<LiveClockProps> = ({
     return (
       <div 
         className={`inline-flex items-center gap-1.5 text-xs font-mono font-bold text-slate-700 dark:text-slate-300 ${className}`}
-        title={`${dayName}, ${fullDateFormatted}`}
+        title={`${dayName}, ${fullDateFormatted} (Jam Operasional: 07:00 - 15:30 WIB)`}
       >
         <Clock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 animate-spin" style={{ animationDuration: '60s' }} />
         <span>{hours}</span>
@@ -117,7 +124,7 @@ export const LiveClock: React.FC<LiveClockProps> = ({
     return (
       <div 
         className={`relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950 text-white p-3 sm:p-4 border border-emerald-900/60 shadow-md ${className}`}
-        title={`Jam Operasional Kasir GreenMart: ${fullDateFormatted}`}
+        title={`Jam Operasional Toko: 07:00 - 15:30 WIB | ${fullDateFormatted}`}
       >
         {/* Subtle radial glow background effect */}
         <div className="absolute top-0 right-0 w-20 h-20 rounded-full bg-emerald-500/10 blur-lg pointer-events-none"></div>
@@ -139,14 +146,23 @@ export const LiveClock: React.FC<LiveClockProps> = ({
                   {dateFormatted}
                 </span>
               </div>
-              <div className="text-[11px] text-slate-400 flex items-center gap-1.5 mt-0.5">
+              <div className="text-[11px] text-slate-400 flex flex-wrap items-center gap-1.5 mt-0.5">
                 <span className="flex items-center gap-1 text-slate-300">
-                  {currentHour >= 6 && currentHour < 18 ? (
+                  {isStoreOpen ? (
                     <Sun className="w-3 h-3 text-amber-400" />
                   ) : (
                     <Moon className="w-3 h-3 text-sky-400" />
                   )}
-                  <span>Waktu {timePeriod}</span>
+                  <span>{timePeriod}</span>
+                </span>
+                <span className="text-slate-600">•</span>
+                <span className={`px-1.5 py-0.2 rounded-md font-semibold text-[10px] flex items-center gap-1 ${
+                  isStoreOpen 
+                    ? 'bg-emerald-900/80 text-emerald-300 border border-emerald-700/60'
+                    : 'bg-slate-800 text-amber-300 border border-slate-700'
+                }`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${isStoreOpen ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`}></span>
+                  <span>{isStoreOpen ? 'Buka (07:00 - 15:30 WIB)' : 'Tutup (07:00 - 15:30 WIB)'}</span>
                 </span>
                 {shiftLabel && (
                   <>

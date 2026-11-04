@@ -4,13 +4,13 @@ import {
   Package, 
   Receipt, 
   BarChart3, 
-  Download, 
   Moon, 
   Sun, 
   HelpCircle,
   UserCheck,
   LogOut,
-  User
+  User,
+  FileSpreadsheet
 } from 'lucide-react';
 import { CashierProfile, GreenMartUser } from '../types';
 import { LiveClock } from './LiveClock';
@@ -26,6 +26,7 @@ interface GreenMartNavbarProps {
   onToggleTheme: () => void;
   onOpenDeployModal: () => void;
   onOpenShortcuts: () => void;
+  onOpenGoogleSheetsModal?: () => void;
   activeCashier?: CashierProfile;
   currentUser?: GreenMartUser | null;
   onOpenCashierDutyModal?: () => void;
@@ -41,6 +42,7 @@ export const GreenMartNavbar: React.FC<GreenMartNavbarProps> = ({
   onToggleTheme,
   onOpenDeployModal,
   onOpenShortcuts,
+  onOpenGoogleSheetsModal,
   activeCashier,
   currentUser,
   onOpenCashierDutyModal,
@@ -149,36 +151,24 @@ export const GreenMartNavbar: React.FC<GreenMartNavbarProps> = ({
 
           </nav>
 
-          {/* Right Action Area */}
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            
-            {/* Deploy / Download ZIP Button */}
-            <button
-              type="button"
-              onClick={onOpenDeployModal}
-              className="inline-flex items-center gap-1.5 px-3 sm:px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-xs sm:text-sm shadow-xs transition cursor-pointer"
-              title="Unduh Cadangan Berkas Sistem (.ZIP)"
-            >
-              <Download className="w-4 h-4" />
-              <span className="hidden sm:inline">Download ZIP</span>
-              <span className="sm:hidden">ZIP</span>
-            </button>
+          {/* Right Action Area - Clean & Platform-Adaptive (Merged Multi-Device) */}
+          <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
 
             {/* Shortcuts Guide Button */}
             <button
               type="button"
               onClick={onOpenShortcuts}
-              className="p-2 rounded-xl text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition cursor-pointer"
+              className="p-1.5 sm:p-2 rounded-xl text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition cursor-pointer"
               title="Shortcut Keyboard"
             >
-              <HelpCircle className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+              <HelpCircle className="w-4 h-4" />
             </button>
 
             {/* Dark Mode Toggle */}
             <button
               type="button"
               onClick={onToggleTheme}
-              className="p-2 rounded-xl text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition cursor-pointer"
+              className="p-1.5 sm:p-2 rounded-xl text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition cursor-pointer"
               title={isDarkMode ? 'Mode Terang' : 'Mode Gelap'}
             >
               {isDarkMode ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
@@ -186,18 +176,18 @@ export const GreenMartNavbar: React.FC<GreenMartNavbarProps> = ({
 
             {/* User Session & Logout */}
             {currentUser && onLogout && (
-              <div className="flex items-center gap-1.5 pl-1.5 border-l border-slate-200 dark:border-slate-800">
+              <div className="flex items-center gap-1 pl-1 sm:pl-1.5 border-l border-slate-200 dark:border-slate-800">
                 <button
                   type="button"
                   onClick={onOpenCashierDutyModal}
-                  className="flex items-center gap-2 px-2.5 py-1 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/80 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700/80 transition cursor-pointer group"
+                  className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-2.5 py-1 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/80 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700/80 transition cursor-pointer group"
                   title={`Petugas login: ${currentUser.name} - Kelas: ${currentUser.studentClass || '-'} (NIS: ${currentUser.nis})`}
                 >
-                  <div className="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 flex items-center justify-center font-black text-xs shrink-0">
+                  <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 flex items-center justify-center font-black text-xs shrink-0">
                     {currentUser.name.charAt(0).toUpperCase()}
                   </div>
                   <div className="hidden sm:flex flex-col text-left">
-                    <span className="text-[11px] font-bold text-slate-900 dark:text-white leading-tight truncate max-w-[110px] group-hover:text-emerald-600 dark:group-hover:text-emerald-400">
+                    <span className="text-[11px] font-bold text-slate-900 dark:text-white leading-tight truncate max-w-[95px] md:max-w-[120px] group-hover:text-emerald-600 dark:group-hover:text-emerald-400">
                       {currentUser.name}
                     </span>
                     <span className="text-[9.5px] font-mono text-slate-400 leading-tight">
@@ -209,7 +199,7 @@ export const GreenMartNavbar: React.FC<GreenMartNavbarProps> = ({
                 <button
                   type="button"
                   onClick={onLogout}
-                  className="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 border border-transparent hover:border-rose-200 dark:hover:border-rose-800 transition cursor-pointer"
+                  className="p-1.5 sm:p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 border border-transparent hover:border-rose-200 dark:hover:border-rose-800 transition cursor-pointer"
                   title="Keluar / Logout Akun"
                 >
                   <LogOut className="w-4 h-4" />

@@ -613,6 +613,9 @@ export function exportGreenMartReceiptPdf(
   doc.text('Jl. Ki Mangunsarkoro No.2, 03, Dracik Barat,', centerX, y, { align: 'center' });
   y += isA4 ? 3.8 : 2.8;
   doc.text('Proyonanggan Sel., Kec. Batang, Batang 51216', centerX, y, { align: 'center' });
+  y += isA4 ? 3.5 : 2.6;
+  doc.setFontSize(isA4 ? 7.8 : is58mm ? 6.5 : 7);
+  doc.text('Jam Operasional: 07:00 - 15:30 WIB', centerX, y, { align: 'center' });
   y += isA4 ? 4.5 : 3.5;
 
   const drawDashedLine = (currY: number) => {
@@ -1283,6 +1286,9 @@ export function generateGreenMartReceiptStandaloneHtml(
         <div style="font-size: 10px; font-weight: 700; color: #000; margin-top: 1px;">Pusat Belanja Segar &amp; Hemat Lengkap</div>
         <div style="font-size: 9px; font-weight: 600; color: #000; line-height: 1.25; margin-top: 2px; padding: 0 1px;">
           ${storeAddressFormatted}
+        </div>
+        <div style="font-size: 8.5px; font-weight: 700; color: #000; margin-top: 1.5px;">
+          Jam Operasional: 07:00 - 15:30 WIB
         </div>
       </div>
 

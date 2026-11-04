@@ -365,6 +365,45 @@ app.delete('/api/sheets/:id/columns/:columnId', (req: Request, res: Response) =>
   });
 });
 
+// GOOGLE SHEETS WEBHOOK SYNC PROXY
+app.post('/api/sheets/sync-webhook', async (req: Request, res: Response) => {
+  try {
+    const { webhookUrl, payload } = req.body;
+    if (!webhookUrl || typeof webhookUrl !== 'string' || !webhookUrl.startsWith('http')) {
+      res.status(400).json({ success: false, message: 'URL webhook Google Apps Script tidak valid' });
+      return;
+    }
+
+    const response = await fetch(webhookUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const text = await response.text();
+    let data: any;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      data = { raw: text };
+    }
+
+    res.json({
+      success: true,
+      message: data.message || 'Data berhasil disinkronkan ke Google Spreadsheet via webhook!',
+      data
+    });
+  } catch (error: any) {
+    console.error('Error forwarding to Google Sheets webhook:', error);
+    res.status(500).json({
+      success: false,
+      message: `Gagal mengirim ke Google Apps Script: ${error?.message || 'Koneksi bermasalah'}`
+    });
+  }
+});
+
 // --- SERVER SETUP (VITE MIDDLEWARE IN DEV OR STATIC IN PROD) ---
 async function startServer() {
   if (!isProd) {
@@ -388,20 +427,20 @@ async function startServer() {
   }
 
   let retryCount = 0;
-  const MAX_RETRIES = 10;
+  const MAX_RETRIES = 25;
 
   // Handle server error events such as EADDRINUSE gracefully
   httpServer.on('error', (err: NodeJS.ErrnoException) => {
     if (err.code === 'EADDRINUSE') {
       if (retryCount < MAX_RETRIES) {
         retryCount++;
-        console.warn(`⚠️ [Server] Port ${PORT} busy, retrying in 500ms (attempt ${retryCount}/${MAX_RETRIES})...`);
+        const waitMs = Math.min(300 + retryCount * 50, 1000);
+        console.warn(`⚠️ [Server] Port ${PORT} busy, retrying in ${waitMs}ms (attempt ${retryCount}/${MAX_RETRIES})...`);
         setTimeout(() => {
-          try {
-            httpServer.close();
-          } catch {}
-          httpServer.listen(PORT, '0.0.0.0');
-        }, 500);
+          if (!httpServer.listening) {
+            httpServer.listen(PORT, '0.0.0.0');
+          }
+        }, waitMs);
       } else {
         console.error(`❌ [Server] Port ${PORT} is still in use after ${MAX_RETRIES} retries. Exiting.`);
         process.exit(1);
@@ -412,13 +451,18 @@ async function startServer() {
     }
   });
 
-  // Graceful shutdown hooks
+  // Graceful shutdown hooks - immediately close all active sockets so the port is freed
   const handleExit = (signal: string) => {
-    console.log(`🛑 [Server] Received ${signal}, closing server...`);
+    console.log(`🛑 [Server] Received ${signal}, releasing port and closing server...`);
+    try {
+      if (typeof (httpServer as any).closeAllConnections === 'function') {
+        (httpServer as any).closeAllConnections();
+      }
+    } catch {}
     httpServer.close(() => {
       process.exit(0);
     });
-    setTimeout(() => process.exit(0), 1500).unref();
+    setTimeout(() => process.exit(0), 1000).unref();
   };
 
   process.once('SIGTERM', () => handleExit('SIGTERM'));

@@ -58,7 +58,7 @@ export const GreenMartExportPdfModal: React.FC<GreenMartExportPdfModalProps> = (
         products,
         {
           dateFilterLabel: dateLabel,
-          storeAddress: 'Jl. Ki Mangunsarkoro No.2, 03, Dracik Barat, Proyonanggan Sel., Kec. Batang, Kabupaten Batang, Jawa Tengah 51216 | Telp: (0285) 391-234 | Email: batang@greenmart.id',
+          storeAddress: 'Jl. Ki Mangunsarkoro No.2, 03, Dracik Barat, Proyonanggan Sel., Kec. Batang, Kabupaten Batang, Jawa Tengah 51216 | Telp: (0285) 391-234 | Email: batang@greenmart.id | Jam Operasional: 07:00 - 15:30 WIB',
           cashierName,
           managerName,
           storeCity,
@@ -87,7 +87,7 @@ export const GreenMartExportPdfModal: React.FC<GreenMartExportPdfModalProps> = (
         products,
         {
           dateFilterLabel: dateLabel,
-          storeAddress: 'Jl. Ki Mangunsarkoro No.2, 03, Dracik Barat, Proyonanggan Sel., Kec. Batang, Kabupaten Batang, Jawa Tengah 51216 | Telp: (0285) 391-234 | Email: batang@greenmart.id',
+          storeAddress: 'Jl. Ki Mangunsarkoro No.2, 03, Dracik Barat, Proyonanggan Sel., Kec. Batang, Kabupaten Batang, Jawa Tengah 51216 | Telp: (0285) 391-234 | Email: batang@greenmart.id | Jam Operasional: 07:00 - 15:30 WIB',
           cashierName,
           managerName,
           storeCity,

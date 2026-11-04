@@ -180,3 +180,44 @@ export interface CashierDutyLog {
   endedAt?: string;
 }
 
+// ==========================================
+// STOCK OPNAME & AUDIT COMPARISON TYPES
+// ==========================================
+
+export interface StockComparisonItem {
+  productId: string;
+  barcode: string;
+  name: string;
+  category: string;
+  costPrice: number;
+  sellingPrice: number;
+  systemStock: number; // Stok yang tercatat di sistem saat audit
+  physicalStock: number; // Stok riil fisik yang dihitung di gudang/rak
+  difference: number; // physicalStock - systemStock
+  financialDiffHpp: number; // difference * costPrice
+  unit: string;
+  status: 'match' | 'minus' | 'surplus';
+  notes: string;
+  isAudited: boolean;
+  updatedAt?: string;
+}
+
+export interface StockAuditReportSummary {
+  auditId?: string;
+  auditDate?: string;
+  auditorName?: string;
+  managerName?: string;
+  storeCity?: string;
+  customNotes?: string;
+  totalSku: number;
+  totalAudited: number;
+  matchedCount: number;
+  minusCount: number;
+  surplusCount: number;
+  totalSystemStock: number;
+  totalPhysicalStock: number;
+  netDifferenceUnits: number;
+  totalFinancialDiffHpp: number;
+  accuracyRate?: number;
+}
+

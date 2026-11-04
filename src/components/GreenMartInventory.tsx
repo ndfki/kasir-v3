@@ -11,12 +11,15 @@ import {
   X, 
   Save, 
   Layers,
-  FileDown
+  FileDown,
+  FileSpreadsheet,
+  Scale
 } from 'lucide-react';
 import { GreenMartProduct, CashierProfile } from '../types';
 import { GREENMART_CATEGORIES } from '../data/greenmartData';
 import { GreenMartConfirmModal } from './GreenMartConfirmModal';
 import { GreenMartExportStockPdfModal } from './GreenMartExportStockPdfModal';
+import { GreenMartStockAuditModal } from './GreenMartStockAuditModal';
 
 interface GreenMartInventoryProps {
   products: GreenMartProduct[];
@@ -27,6 +30,8 @@ interface GreenMartInventoryProps {
   onRestock: (productId: string, quantity: number) => void;
   activeCashier?: CashierProfile;
   onShowToast?: (message: string, type?: 'success' | 'error' | 'info') => void;
+  onOpenGoogleSheetsModal?: () => void;
+  onReconcileStocks?: (updatedProducts: GreenMartProduct[]) => void;
 }
 
 export const GreenMartInventory: React.FC<GreenMartInventoryProps> = ({
@@ -37,7 +42,9 @@ export const GreenMartInventory: React.FC<GreenMartInventoryProps> = ({
   onBulkDeleteProducts,
   onRestock,
   activeCashier,
-  onShowToast
+  onShowToast,
+  onOpenGoogleSheetsModal,
+  onReconcileStocks
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('Semua');
@@ -50,6 +57,7 @@ export const GreenMartInventory: React.FC<GreenMartInventoryProps> = ({
   // Modals state
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [isExportStockPdfModalOpen, setIsExportStockPdfModalOpen] = useState(false);
+  const [isStockAuditModalOpen, setIsStockAuditModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<GreenMartProduct | null>(null);
   const [productToDelete, setProductToDelete] = useState<GreenMartProduct | null>(null);
 
@@ -343,6 +351,30 @@ export const GreenMartInventory: React.FC<GreenMartInventoryProps> = ({
               Habis ({outOfStockCount})
             </button>
           </div>
+
+          {/* Tombol Simpan ke Google Spreadsheet */}
+          {onOpenGoogleSheetsModal && (
+            <button
+              type="button"
+              onClick={onOpenGoogleSheetsModal}
+              className="px-3.5 py-2.5 rounded-xl border border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 font-bold text-xs sm:text-sm flex items-center gap-1.5 transition cursor-pointer shrink-0 shadow-2xs"
+              title="Simpan data inventaris stok ke Google Spreadsheet (Cloud Webhook / .xlsx)"
+            >
+              <FileSpreadsheet className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <span>Google Sheets</span>
+            </button>
+          )}
+
+          {/* Bandingkan Stok Gudang (Stock Opname) Button */}
+          <button
+            type="button"
+            onClick={() => setIsStockAuditModalOpen(true)}
+            className="px-3.5 py-2.5 rounded-xl border border-indigo-300 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 font-bold text-xs sm:text-sm flex items-center gap-1.5 transition cursor-pointer shrink-0 shadow-2xs"
+            title="Bandingkan stok fisik di gudang dengan catatan sistem (Stock Opname)"
+          >
+            <Scale className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+            <span>Bandingkan Stok (Opname)</span>
+          </button>
 
           {/* Export Stock PDF with Personalization Button */}
           <button
@@ -834,6 +866,20 @@ export const GreenMartInventory: React.FC<GreenMartInventoryProps> = ({
         activeCategory={selectedCategory}
         activeStockFilter={stockFilter}
         activeCashier={activeCashier}
+        onShowToast={onShowToast}
+      />
+
+      {/* STOCK OPNAME & AUDIT COMPARISON MODAL */}
+      <GreenMartStockAuditModal
+        isOpen={isStockAuditModalOpen}
+        onClose={() => setIsStockAuditModalOpen(false)}
+        products={products}
+        activeCashier={activeCashier}
+        onReconcileStocks={(updated) => {
+          if (onReconcileStocks) {
+            onReconcileStocks(updated);
+          }
+        }}
         onShowToast={onShowToast}
       />
 

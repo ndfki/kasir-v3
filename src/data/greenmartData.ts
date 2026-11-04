@@ -218,12 +218,20 @@ const getTwoDaysAgoStr = () => {
   return d.toISOString().split('T')[0];
 };
 
+// Store Operating Hours definition (GreenMart Batang)
+export const STORE_OPERATING_HOURS = {
+  open: '07:00',
+  close: '15:30',
+  timezone: 'WIB',
+  label: '07:00 - 15:30 WIB'
+};
+
 export const initialGreenMartTransactions: GreenMartTransaction[] = [
   {
     id: 'trx-101',
     invoiceNumber: 'GM-20261024-001',
     date: getTodayStr(),
-    time: '08:15:30',
+    time: '07:45:10',
     cashierName: 'Dewi Sartika (Kasir 01)',
     customerName: 'Ibu Ratna',
     customerPhone: '081234567890',
@@ -236,7 +244,7 @@ export const initialGreenMartTransactions: GreenMartTransaction[] = [
     changeAmount: 4500,
     paymentStatus: 'Lunas',
     notes: 'Belanja mingguan dapur',
-    createdAt: `${getTodayStr()}T08:15:30Z`,
+    createdAt: `${getTodayStr()}T07:45:10Z`,
     items: [
       {
         productId: 'prod-1',
@@ -292,7 +300,7 @@ export const initialGreenMartTransactions: GreenMartTransaction[] = [
     id: 'trx-102',
     invoiceNumber: 'GM-20261024-002',
     date: getTodayStr(),
-    time: '09:20:10',
+    time: '08:35:20',
     cashierName: 'Dewi Sartika (Kasir 01)',
     customerName: 'Pak Hendra',
     customerPhone: '',
@@ -305,7 +313,7 @@ export const initialGreenMartTransactions: GreenMartTransaction[] = [
     changeAmount: 0,
     paymentStatus: 'Lunas',
     notes: 'QRIS Gopay',
-    createdAt: `${getTodayStr()}T09:20:10Z`,
+    createdAt: `${getTodayStr()}T08:35:20Z`,
     items: [
       {
         productId: 'prod-2',
@@ -349,7 +357,7 @@ export const initialGreenMartTransactions: GreenMartTransaction[] = [
     id: 'trx-103',
     invoiceNumber: 'GM-20261024-003',
     date: getTodayStr(),
-    time: '10:45:15',
+    time: '09:45:15',
     cashierName: 'Budi Kurnia (Kasir 02)',
     customerName: 'Siti Aminah',
     customerPhone: '085712345678',
@@ -362,7 +370,7 @@ export const initialGreenMartTransactions: GreenMartTransaction[] = [
     changeAmount: 20000,
     paymentStatus: 'Lunas',
     notes: 'Diskon promo akhir pekan',
-    createdAt: `${getTodayStr()}T10:45:15Z`,
+    createdAt: `${getTodayStr()}T09:45:15Z`,
     items: [
       {
         productId: 'prod-4',
@@ -418,7 +426,7 @@ export const initialGreenMartTransactions: GreenMartTransaction[] = [
     id: 'trx-104',
     invoiceNumber: 'GM-20261024-004',
     date: getTodayStr(),
-    time: '12:05:40',
+    time: '11:15:40',
     cashierName: 'Budi Kurnia (Kasir 02)',
     customerName: 'Warung Bu Joko',
     customerPhone: '081399887766',
@@ -431,7 +439,7 @@ export const initialGreenMartTransactions: GreenMartTransaction[] = [
     changeAmount: 10000,
     paymentStatus: 'Lunas',
     notes: 'Kulakan warung langganan',
-    createdAt: `${getTodayStr()}T12:05:40Z`,
+    createdAt: `${getTodayStr()}T11:15:40Z`,
     items: [
       {
         productId: 'prod-4',
@@ -463,7 +471,7 @@ export const initialGreenMartTransactions: GreenMartTransaction[] = [
     id: 'trx-105',
     invoiceNumber: 'GM-20261024-005',
     date: getTodayStr(),
-    time: '13:30:22',
+    time: '12:20:22',
     cashierName: 'Dewi Sartika (Kasir 01)',
     customerName: 'Mas Danu',
     customerPhone: '',
@@ -475,8 +483,8 @@ export const initialGreenMartTransactions: GreenMartTransaction[] = [
     cashGiven: 50000,
     changeAmount: 2000,
     paymentStatus: 'Lunas',
-    notes: '',
-    createdAt: `${getTodayStr()}T13:30:22Z`,
+    notes: 'Belanja waktu istirahat siang',
+    createdAt: `${getTodayStr()}T12:20:22Z`,
     items: [
       {
         productId: 'prod-10',
@@ -508,7 +516,7 @@ export const initialGreenMartTransactions: GreenMartTransaction[] = [
     id: 'trx-106',
     invoiceNumber: 'GM-20261024-006',
     date: getTodayStr(),
-    time: '15:45:10',
+    time: '13:15:10',
     cashierName: 'Budi Kurnia (Kasir 02)',
     customerName: 'Kak Vina',
     customerPhone: '',
@@ -520,8 +528,8 @@ export const initialGreenMartTransactions: GreenMartTransaction[] = [
     cashGiven: 78500,
     changeAmount: 0,
     paymentStatus: 'Lunas',
-    notes: 'Belanja sore hari',
-    createdAt: `${getTodayStr()}T15:45:10Z`,
+    notes: 'Belanja siang hari',
+    createdAt: `${getTodayStr()}T13:15:10Z`,
     items: [
       {
         productId: 'prod-5',
@@ -565,7 +573,7 @@ export const initialGreenMartTransactions: GreenMartTransaction[] = [
     id: 'trx-107',
     invoiceNumber: 'GM-20261024-007',
     date: getTodayStr(),
-    time: '17:50:30',
+    time: '14:05:30',
     cashierName: 'Dewi Sartika (Kasir 01)',
     customerName: 'Ibu Ningsih',
     customerPhone: '081298765432',
@@ -577,8 +585,8 @@ export const initialGreenMartTransactions: GreenMartTransaction[] = [
     cashGiven: 250000,
     changeAmount: 40000,
     paymentStatus: 'Lunas',
-    notes: 'Puncak belanja jam pulang kerja',
-    createdAt: `${getTodayStr()}T17:50:30Z`,
+    notes: 'Belanja kebutuhan pokok siang',
+    createdAt: `${getTodayStr()}T14:05:30Z`,
     items: [
       {
         productId: 'prod-2',
@@ -634,7 +642,7 @@ export const initialGreenMartTransactions: GreenMartTransaction[] = [
     id: 'trx-108',
     invoiceNumber: 'GM-20261024-008',
     date: getTodayStr(),
-    time: '19:35:00',
+    time: '14:45:00',
     cashierName: 'Budi Kurnia (Kasir 02)',
     customerName: 'Pak Dedi',
     customerPhone: '',
@@ -646,8 +654,8 @@ export const initialGreenMartTransactions: GreenMartTransaction[] = [
     cashGiven: 132000,
     changeAmount: 0,
     paymentStatus: 'Lunas',
-    notes: 'Belanja kebutuhan malam',
-    createdAt: `${getTodayStr()}T19:35:00Z`,
+    notes: 'Belanja perlengkapan rumah',
+    createdAt: `${getTodayStr()}T14:45:00Z`,
     items: [
       {
         productId: 'prod-9',
@@ -691,7 +699,7 @@ export const initialGreenMartTransactions: GreenMartTransaction[] = [
     id: 'trx-109',
     invoiceNumber: 'GM-20261024-009',
     date: getTodayStr(),
-    time: '20:45:15',
+    time: '15:15:15',
     cashierName: 'Budi Kurnia (Kasir 02)',
     customerName: 'Mbak Cindy',
     customerPhone: '',
@@ -703,8 +711,8 @@ export const initialGreenMartTransactions: GreenMartTransaction[] = [
     cashGiven: 100000,
     changeAmount: 37500,
     paymentStatus: 'Lunas',
-    notes: 'Belanja cemilan malam sebelum toko tutup',
-    createdAt: `${getTodayStr()}T20:45:15Z`,
+    notes: 'Belanja sebelum tutup operasional 15:30 WIB',
+    createdAt: `${getTodayStr()}T15:15:15Z`,
     items: [
       {
         productId: 'prod-4',

@@ -109,11 +109,17 @@ export const GreenMartCashierDutyModal: React.FC<GreenMartCashierDutyModalProps>
               <UserCheck className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight">
-                Kasir yang Bertugas Hari Ini &amp; Seterusnya
-              </h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Atur siapa kasir yang berjaga, ganti shift harian, atau tambah data kasir baru
+              <div className="flex flex-wrap items-center gap-2">
+                <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight">
+                  Kasir yang Bertugas Hari Ini &amp; Seterusnya
+                </h2>
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-bold text-[10.5px] border border-emerald-300 dark:border-emerald-800 font-mono">
+                  <Clock className="w-3 h-3 text-emerald-600" />
+                  <span>07:00 - 15:30 WIB</span>
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Atur jadwal shift kasir jam operasional GreenMart (07:00 - 15:30 WIB)
               </p>
             </div>
           </div>
@@ -249,7 +255,7 @@ export const GreenMartCashierDutyModal: React.FC<GreenMartCashierDutyModalProps>
                             </span>
                           )}
                           <span className="font-semibold text-emerald-700 dark:text-emerald-400">
-                            Shift {cashier.shift}
+                            Shift {cashier.shift} {cashier.shift === 'Pagi' ? '(07:00 - 11:30)' : cashier.shift === 'Siang' ? '(11:30 - 15:30)' : '(07:00 - 15:30)'}
                           </span>
                         </div>
 
@@ -357,19 +363,26 @@ export const GreenMartCashierDutyModal: React.FC<GreenMartCashierDutyModalProps>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase">
                   Shift Jaga
                 </label>
-                <div className="grid grid-cols-4 gap-2">
-                  {(['Pagi', 'Siang', 'Sore', 'Full Day'] as CashierShiftType[]).map((s) => (
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { shift: 'Pagi' as CashierShiftType, label: 'Shift Pagi', time: '07:00 - 11:30' },
+                    { shift: 'Siang' as CashierShiftType, label: 'Shift Siang', time: '11:30 - 15:30' },
+                    { shift: 'Full Day' as CashierShiftType, label: 'Full Day', time: '07:00 - 15:30' }
+                  ].map((s) => (
                     <button
-                      key={s}
+                      key={s.shift}
                       type="button"
-                      onClick={() => setNewShift(s)}
-                      className={`py-2 px-1 text-xs font-bold rounded-xl border transition cursor-pointer text-center ${
-                        newShift === s
+                      onClick={() => setNewShift(s.shift)}
+                      className={`py-2 px-1 text-xs font-bold rounded-xl border transition cursor-pointer text-center flex flex-col items-center justify-center ${
+                        newShift === s.shift
                           ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
                           : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700'
                       }`}
                     >
-                      {s}
+                      <span>{s.label}</span>
+                      <span className={`text-[10px] font-mono mt-0.5 ${newShift === s.shift ? 'text-emerald-100 font-bold' : 'text-slate-400 font-medium'}`}>
+                        {s.time}
+                      </span>
                     </button>
                   ))}
                 </div>

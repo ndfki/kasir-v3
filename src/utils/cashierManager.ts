@@ -5,14 +5,14 @@ const CASHIERS_ROSTER_KEY = 'greenmart_cashiers_roster_v1';
 const ACTIVE_CASHIER_KEY = 'greenmart_active_cashier_v1';
 const DUTY_HISTORY_KEY = 'greenmart_cashier_duty_history_v1';
 
-// Preset default cashiers for school koperasi/mart
+// Preset default cashiers for school koperasi/mart (Jam Operasional: 07:00 - 15:30 WIB)
 export const DEFAULT_CASHIERS: CashierProfile[] = [
   {
     id: 'csh-01',
     name: 'Dewi Sartika',
     nis: '20241001',
     studentClass: 'XII BDP 1',
-    shift: 'Pagi',
+    shift: 'Pagi', // 07:00 - 11:30 WIB
     phone: '0812-3456-7890',
     isActiveDuty: true,
     addedAt: '2026-01-01'
@@ -22,7 +22,7 @@ export const DEFAULT_CASHIERS: CashierProfile[] = [
     name: 'Budi Santoso',
     nis: '20241002',
     studentClass: 'XI AKL 2',
-    shift: 'Siang',
+    shift: 'Siang', // 11:30 - 15:30 WIB
     phone: '0813-9876-5432',
     isActiveDuty: false,
     addedAt: '2026-01-01'
@@ -32,7 +32,7 @@ export const DEFAULT_CASHIERS: CashierProfile[] = [
     name: 'Siti Rahmawati',
     nis: '20241003',
     studentClass: 'XII BDP 2',
-    shift: 'Sore',
+    shift: 'Pagi', // 07:00 - 11:30 WIB
     phone: '0821-4567-8901',
     isActiveDuty: false,
     addedAt: '2026-01-01'
@@ -42,7 +42,7 @@ export const DEFAULT_CASHIERS: CashierProfile[] = [
     name: 'Ahmad Fauzi',
     nis: '20241004',
     studentClass: 'XI OTKP 1',
-    shift: 'Full Day',
+    shift: 'Full Day', // 07:00 - 15:30 WIB
     phone: '0857-1122-3344',
     isActiveDuty: false,
     addedAt: '2026-01-01'
@@ -183,7 +183,7 @@ export function loadDutyHistory(): CashierDutyLog[] {
       cashierNis: DEFAULT_CASHIERS[0].nis,
       studentClass: DEFAULT_CASHIERS[0].studentClass,
       shift: DEFAULT_CASHIERS[0].shift,
-      startedAt: '07:30'
+      startedAt: '07:00'
     }
   ];
 }

@@ -27,6 +27,8 @@ import { KeyboardShortcutsModal } from './components/KeyboardShortcutsModal';
 import { GreenMartLogin } from './components/GreenMartLogin';
 import { GreenMartCashierDutyModal } from './components/GreenMartCashierDutyModal';
 import { GreenMartConfirmModal } from './components/GreenMartConfirmModal';
+import { GreenMartGoogleSheetsModal } from './components/GreenMartGoogleSheetsModal';
+import { getGoogleSheetsConfig, syncToGoogleSheetsWebhook } from './utils/googleSheetsSync';
 import { 
   loadAuthUser, 
   saveAuthUser, 
@@ -101,6 +103,7 @@ export default function App() {
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
   const [isCashierDutyModalOpen, setIsCashierDutyModalOpen] = useState(false);
   const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
+  const [isGoogleSheetsModalOpen, setIsGoogleSheetsModalOpen] = useState(false);
 
   // User Authentication & Cashier Shift State
   const [currentUser, setCurrentUser] = useState<GreenMartUser | null>(loadAuthUser);
@@ -292,6 +295,19 @@ export default function App() {
     // 2. Prepend transaction to transaction history
     setTransactions(prev => [newTrx, ...prev]);
 
+    // 3. Auto-sync to Google Spreadsheet if enabled
+    try {
+      const gsConfig = getGoogleSheetsConfig();
+      if (gsConfig.autoSyncOnTransaction && gsConfig.webhookUrl) {
+        const updatedTrx = [newTrx, ...transactions];
+        syncToGoogleSheetsWebhook(gsConfig.webhookUrl, products, updatedTrx).catch(err => {
+          console.warn('Background auto-sync to Google Sheets failed:', err);
+        });
+      }
+    } catch (e) {
+      console.warn('Auto-sync execution error:', e);
+    }
+
     showToast(`Transaksi ${newTrx.invoiceNumber} berhasil! Stok telah dipotong.`, 'success');
   };
 
@@ -436,6 +452,17 @@ export default function App() {
     showToast(`Stok ${found?.name || ''} ditambah +${quantity} unit`, 'success');
   };
 
+  // Reconcile Stocks from Stock Opname Audit
+  const handleReconcileStocks = (updatedProducts: GreenMartProduct[]) => {
+    setProducts(updatedProducts);
+    try {
+      localStorage.setItem('greenmart_products_v2', JSON.stringify(updatedProducts));
+    } catch (e) {
+      console.warn('Failed to persist reconciled products:', e);
+    }
+    showToast(`Berhasil merekonsiliasi stok fisik ke dalam sistem (${updatedProducts.length} barang)!`, 'success');
+  };
+
   // Count low stock items
   const lowStockCount = products.filter(p => p.stock <= p.minStock).length;
   
@@ -505,6 +532,7 @@ export default function App() {
         onToggleTheme={handleToggleTheme}
         onOpenDeployModal={() => setIsDeployModalOpen(true)}
         onOpenShortcuts={() => setIsShortcutsOpen(true)}
+        onOpenGoogleSheetsModal={() => setIsGoogleSheetsModalOpen(true)}
         activeCashier={activeCashier}
         currentUser={currentUser}
         onOpenCashierDutyModal={() => setIsCashierDutyModalOpen(true)}
@@ -540,6 +568,8 @@ export default function App() {
             onRestock={handleRestock}
             activeCashier={activeCashier}
             onShowToast={showToast}
+            onOpenGoogleSheetsModal={() => setIsGoogleSheetsModalOpen(true)}
+            onReconcileStocks={handleReconcileStocks}
           />
         )}
 
@@ -549,6 +579,9 @@ export default function App() {
             onCancelTransaction={handleCancelTransaction}
             onBulkDeleteTransactions={handleBulkDeleteTransactions}
             onSettleTransaction={handleSettleTransaction}
+            activeCashier={activeCashier}
+            onShowToast={showToast}
+            onOpenGoogleSheetsModal={() => setIsGoogleSheetsModalOpen(true)}
           />
         )}
 
@@ -557,6 +590,7 @@ export default function App() {
             products={products}
             transactions={transactions}
             onShowToast={showToast}
+            onOpenGoogleSheetsModal={() => setIsGoogleSheetsModalOpen(true)}
           />
         )}
 
@@ -598,6 +632,15 @@ export default function App() {
       <KeyboardShortcutsModal
         isOpen={isShortcutsOpen}
         onClose={() => setIsShortcutsOpen(false)}
+      />
+
+      {/* Google Spreadsheet Integration & Sync Modal */}
+      <GreenMartGoogleSheetsModal
+        isOpen={isGoogleSheetsModalOpen}
+        onClose={() => setIsGoogleSheetsModalOpen(false)}
+        products={products}
+        transactions={transactions}
+        onShowToast={showToast}
       />
 
       {/* Footer */}

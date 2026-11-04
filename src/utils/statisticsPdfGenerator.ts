@@ -1,6 +1,12 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { DailyStatisticalReport, GreenMartProduct, GreenMartTransaction } from '../types';
+import { 
+  DailyStatisticalReport, 
+  GreenMartProduct, 
+  GreenMartTransaction,
+  StockComparisonItem,
+  StockAuditReportSummary
+} from '../types';
 import { GREENMART_LOGO_COLOR_BASE64 } from './greenmartLogoBase64';
 
 export interface PdfExportOptions {
@@ -95,7 +101,7 @@ export function generateStatisticsPdf(
   // Kontak & Koperasi (Line 2)
   doc.setFontSize(7.5);
   doc.setTextColor(100, 116, 139); // slate-500
-  doc.text('Telp: (0285) 391-234   |   Email: batang@greenmart.id   |   Unit Koperasi Siswa Batang', headerTextX, 21.5);
+  doc.text('Telp: (0285) 391-234   |   Email: batang@greenmart.id   |   Jam Operasional: 07:00 - 15:30 WIB', headerTextX, 21.5);
 
   // Document Badge (Line 3 - Clean official text without technical jargon)
   doc.setFont('helvetica', 'bold');
@@ -576,6 +582,7 @@ export interface TransactionHistoryPdfOptions {
   storeCity?: string;
   cashierName?: string;
   managerName?: string;
+  customNotes?: string;
 }
 
 /**
@@ -593,7 +600,8 @@ export function generateTransactionHistoryPdf(
     storeAddress = 'Jl. Ki Mangunsarkoro No.2, 03, Dracik Barat, Proyonanggan Sel., Kec. Batang, Kabupaten Batang, Jawa Tengah 51216 | Telp: (0285) 391-234 | Email: batang@greenmart.id',
     storeCity = 'Batang',
     cashierName = 'Kasir Penanggung Jawab',
-    managerName = 'Manajer Operasional'
+    managerName = 'Manajer Operasional',
+    customNotes = 'Laporan resmi ini disajikan otomatis berdasarkan rekaman riwayat transaksi kasir POS GreenMart Batang.'
   } = options;
 
   const doc = new jsPDF({
@@ -823,14 +831,28 @@ export function generateTransactionHistoryPdf(
   });
 
   // Footer & Signatures
-  const finalY = (doc as any).lastAutoTable ? (doc as any).lastAutoTable.finalY + 8 : cardY + cardHeight + 20;
+  let finalY = (doc as any).lastAutoTable ? (doc as any).lastAutoTable.finalY + 6 : cardY + cardHeight + 20;
+
+  // Custom Notes Block if provided
+  if (customNotes && customNotes.trim().length > 0) {
+    if (finalY > pageHeight - 48) {
+      doc.addPage();
+      finalY = 20;
+    }
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(7.5);
+    doc.setTextColor(100, 116, 139);
+    doc.text(`Catatan: ${customNotes}`, marginX, finalY);
+    finalY += 6;
+  }
   
   // If not enough room for signatures, add new page
-  if (finalY > pageHeight - 35) {
+  if (finalY > pageHeight - 38) {
     doc.addPage();
+    finalY = 20;
   }
 
-  const signY = finalY > pageHeight - 35 ? 20 : finalY;
+  const signY = finalY;
   const colWidth = 60;
   const rightColX = pageWidth - marginX - colWidth;
 
@@ -891,6 +913,28 @@ export function exportTransactionHistoryReportPdf(
   const cleanDate = (options.dateFilterLabel || 'semua').replace(/[^a-zA-Z0-9_-]/g, '_');
   const filename = `Laporan_Riwayat_Transaksi_GreenMart_${cleanDate}.pdf`;
   doc.save(filename);
+}
+
+/**
+ * Direct print helper for Transaction History PDF report
+ */
+export function printTransactionHistoryReportPdf(
+  transactions: GreenMartTransaction[],
+  options: TransactionHistoryPdfOptions = {}
+): void {
+  const doc = generateTransactionHistoryPdf(transactions, options);
+  doc.autoPrint();
+  const blobUrl = doc.output('bloburl');
+  const printWindow = window.open(blobUrl, '_blank');
+  if (!printWindow) {
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = String(blobUrl);
+    document.body.appendChild(iframe);
+    iframe.onload = () => {
+      iframe.contentWindow?.print();
+    };
+  }
 }
 
 // =========================================================================
@@ -1274,5 +1318,404 @@ export function printInventoryStockReportPdf(
   const blobUrl = doc.output('bloburl');
   window.open(blobUrl, '_blank');
 }
+
+// =========================================================================
+// LAPORAN BERITA ACARA AUDIT STOCK OPNAME & REKONSILIASI GUDANG
+// =========================================================================
+
+export interface StockOpnamePdfOptions {
+  storeName?: string;
+  storeAddress?: string;
+  storeCity?: string;
+  auditorName?: string;
+  managerName?: string;
+  customNotes?: string;
+  filterMode?: 'all' | 'discrepancy' | 'minus' | 'surplus';
+}
+
+/**
+ * Generate official PDF report for Stock Opname Audit & Discrepancy Comparison
+ */
+export function generateStockOpnameAuditPdf(
+  items: StockComparisonItem[],
+  options: StockOpnamePdfOptions = {}
+): jsPDF {
+  const {
+    storeName = 'GREENMART SUPERMARKET & POS',
+    storeAddress = 'Jl. Ki Mangunsarkoro No.2, 03, Dracik Barat, Proyonanggan Sel., Kec. Batang, Kabupaten Batang, Jawa Tengah 51216 | Telp: (0285) 391-234 | Email: batang@greenmart.id',
+    storeCity = 'Batang',
+    auditorName = 'Petugas Pemeriksa Gudang',
+    managerName = 'Bambang S., S.E.',
+    customNotes = 'Laporan berita acara ini disajikan otomatis berdasarkan hasil audit fisik barang di gudang vs stok sistem POS.',
+    filterMode = 'all'
+  } = options;
+
+  const doc = new jsPDF({
+    orientation: 'landscape',
+    unit: 'mm',
+    format: 'a4'
+  });
+
+  const pageWidth = doc.internal.pageSize.getWidth(); // 297mm
+  const pageHeight = doc.internal.pageSize.getHeight(); // 210mm
+  const marginX = 14;
+
+  const today = new Date();
+  const printTimestamp = today.toLocaleDateString('id-ID', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  }) + ` pukul ${today.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB`;
+
+  const docId = `GM-OPNAME-${today.getFullYear()}${(today.getMonth() + 1).toString().padStart(2, '0')}${today.getDate().toString().padStart(2, '0')}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+
+  // Top stripes
+  doc.setFillColor(16, 185, 129); // emerald-600
+  doc.rect(0, 0, pageWidth, 5, 'F');
+  doc.setFillColor(5, 150, 105); // emerald-700
+  doc.rect(0, 5, pageWidth, 1.5, 'F');
+
+  // GreenMart Logo
+  try {
+    doc.addImage(GREENMART_LOGO_COLOR_BASE64, 'PNG', marginX, 8, 16, 16);
+  } catch (e) {
+    console.warn('Could not add logo to stock opname PDF:', e);
+  }
+
+  const headerX = marginX + 20;
+
+  // Title
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(14);
+  doc.setTextColor(15, 23, 42);
+  doc.text(storeName, headerX, 13);
+
+  // Address
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7.5);
+  doc.setTextColor(71, 85, 105);
+  doc.text(storeAddress.split('|')[0].trim(), headerX, 17.5);
+
+  // Contact line
+  doc.setFontSize(7.5);
+  doc.setTextColor(100, 116, 139);
+  doc.text('Telp: (0285) 391-234   |   Email: batang@greenmart.id   |   Unit Koperasi Siswa Batang', headerX, 21.5);
+
+  // Badge
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(7.5);
+  doc.setTextColor(16, 185, 129);
+  doc.text('BERITA ACARA AUDIT STOCK OPNAME & REKONSILIASI FISIK GUDANG', headerX, 26);
+
+  // Divider
+  const dividerY = 29.5;
+  doc.setDrawColor(203, 213, 225);
+  doc.setLineWidth(0.6);
+  doc.line(marginX, dividerY, pageWidth - marginX, dividerY);
+
+  // Title line
+  const titleY = dividerY + 6.5;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.setTextColor(15, 23, 42);
+  doc.text('BERITA ACARA PEMBANDING STOK FISIK GUDANG VS SISTEM POS', marginX, titleY);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(100, 116, 139);
+  doc.text(`No. Registrasi: ${docId} | Waktu Audit: ${printTimestamp} | Filter Data: ${filterMode === 'discrepancy' ? 'Hanya Produk Berselisih' : 'Semua Produk Terdaftar'}`, marginX, titleY + 5);
+
+  // Filtered items
+  const displayItems = filterMode === 'discrepancy'
+    ? items.filter(i => i.difference !== 0)
+    : filterMode === 'minus'
+    ? items.filter(i => i.difference < 0)
+    : filterMode === 'surplus'
+    ? items.filter(i => i.difference > 0)
+    : items;
+
+  // Metric summaries
+  const totalSku = items.length;
+  const matchCount = items.filter(i => i.difference === 0).length;
+  const minusCount = items.filter(i => i.difference < 0).length;
+  const surplusCount = items.filter(i => i.difference > 0).length;
+  const totalFinancialDiffHpp = items.reduce((sum, i) => sum + i.financialDiffHpp, 0);
+
+  const cardY = titleY + 8.5;
+  const cardWidth = (pageWidth - marginX * 2 - 12) / 4;
+  const cardHeight = 14;
+
+  // Box 1: Total SKU & Match
+  doc.setFillColor(248, 250, 252);
+  doc.setDrawColor(226, 232, 240);
+  doc.roundedRect(marginX, cardY, cardWidth, cardHeight, 2, 2, 'FD');
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7);
+  doc.setTextColor(100, 116, 139);
+  doc.text('TOTAL SKU DIPERIKSA', marginX + 3.5, cardY + 4.5);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.setTextColor(15, 23, 42);
+  doc.text(`${totalSku} Produk (${Math.round((matchCount / (totalSku || 1)) * 100)}% Klop)`, marginX + 3.5, cardY + 10.5);
+
+  // Box 2: Stok Klop (Match)
+  const box2X = marginX + cardWidth + 4;
+  doc.setFillColor(236, 253, 245);
+  doc.setDrawColor(167, 243, 208);
+  doc.roundedRect(box2X, cardY, cardWidth, cardHeight, 2, 2, 'FD');
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7);
+  doc.setTextColor(4, 120, 87);
+  doc.text('STOK SESUAI (KLOP)', box2X + 3.5, cardY + 4.5);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.setTextColor(6, 95, 70);
+  doc.text(`${matchCount} Produk Cocok`, box2X + 3.5, cardY + 10.5);
+
+  // Box 3: Stok Selisih (Minus & Plus)
+  const box3X = box2X + cardWidth + 4;
+  doc.setFillColor(minusCount > 0 ? 254 : 248, minusCount > 0 ? 242 : 250, minusCount > 0 ? 242 : 252);
+  doc.setDrawColor(minusCount > 0 ? 254 : 226, minusCount > 0 ? 202 : 232, minusCount > 0 ? 202 : 240);
+  doc.roundedRect(box3X, cardY, cardWidth, cardHeight, 2, 2, 'FD');
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7);
+  doc.setTextColor(minusCount > 0 ? 185 : 100, minusCount > 0 ? 28 : 116, minusCount > 0 ? 28 : 139);
+  doc.text('SELISIH FISIK VS SISTEM', box3X + 3.5, cardY + 4.5);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.setTextColor(minusCount > 0 ? 185 : 15, minusCount > 0 ? 28 : 23, minusCount > 0 ? 28 : 42);
+  doc.text(`${minusCount} Minus | ${surplusCount} Surplus`, box3X + 3.5, cardY + 10.5);
+
+  // Box 4: Total Valuasi Selisih HPP
+  const box4X = box3X + cardWidth + 4;
+  doc.setFillColor(totalFinancialDiffHpp < 0 ? 254 : 239, totalFinancialDiffHpp < 0 ? 242 : 246, totalFinancialDiffHpp < 0 ? 242 : 255);
+  doc.setDrawColor(totalFinancialDiffHpp < 0 ? 254 : 191, totalFinancialDiffHpp < 0 ? 202 : 219, totalFinancialDiffHpp < 0 ? 202 : 254);
+  doc.roundedRect(box4X, cardY, cardWidth, cardHeight, 2, 2, 'FD');
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7);
+  doc.setTextColor(totalFinancialDiffHpp < 0 ? 185 : 29, totalFinancialDiffHpp < 0 ? 28 : 78, totalFinancialDiffHpp < 0 ? 28 : 216);
+  doc.text('VALUASI SELISIH MODAL (HPP)', box4X + 3.5, cardY + 4.5);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.setTextColor(totalFinancialDiffHpp < 0 ? 185 : 30, totalFinancialDiffHpp < 0 ? 28 : 64, totalFinancialDiffHpp < 0 ? 28 : 175);
+  doc.text(
+    (totalFinancialDiffHpp >= 0 ? '+' : '') + formatRupiah(totalFinancialDiffHpp),
+    box4X + 3.5,
+    cardY + 10.5
+  );
+
+  // AutoTable
+  const headers = [
+    'No',
+    'Barcode',
+    'Nama Barang',
+    'Kategori',
+    'Stok Sistem',
+    'Stok Fisik',
+    'Selisih (Varian)',
+    'Harga Modal (HPP)',
+    'Nilai Selisih HPP',
+    'Status & Keterangan Audit'
+  ];
+
+  const bodyData = displayItems.map((item, idx) => {
+    const diffSign = item.difference > 0 ? `+${item.difference}` : item.difference.toString();
+    const statusText = item.difference === 0 
+      ? 'SESUAI' 
+      : item.difference < 0 
+      ? `MINUS (${item.difference} ${item.unit})` 
+      : `SURPLUS (+${item.difference} ${item.unit})`;
+
+    const noteText = item.notes && item.notes !== 'Sesuai' ? ` (${item.notes})` : '';
+
+    return [
+      (idx + 1).toString(),
+      item.barcode,
+      item.name,
+      item.category,
+      `${item.systemStock} ${item.unit}`,
+      `${item.physicalStock} ${item.unit}`,
+      `${diffSign} ${item.unit}`,
+      formatRupiah(item.costPrice),
+      formatRupiah(item.financialDiffHpp),
+      `${statusText}${noteText}`
+    ];
+  });
+
+  autoTable(doc, {
+    startY: cardY + cardHeight + 4.5,
+    head: [headers],
+    body: bodyData,
+    theme: 'grid',
+    styles: {
+      fontSize: 7.5,
+      cellPadding: 1.8,
+      lineColor: [226, 232, 240],
+      lineWidth: 0.15
+    },
+    headStyles: {
+      fillColor: [6, 78, 59], // emerald-900
+      textColor: [255, 255, 255],
+      fontStyle: 'bold',
+      fontSize: 7.5,
+      halign: 'left'
+    },
+    alternateRowStyles: {
+      fillColor: [248, 250, 252]
+    },
+    columnStyles: {
+      0: { cellWidth: 9, halign: 'center' },
+      1: { cellWidth: 26, fontStyle: 'bold' },
+      2: { cellWidth: 54 },
+      3: { cellWidth: 26 },
+      4: { cellWidth: 22, halign: 'right' },
+      5: { cellWidth: 22, halign: 'right', fontStyle: 'bold' },
+      6: { cellWidth: 24, halign: 'right', fontStyle: 'bold' },
+      7: { cellWidth: 24, halign: 'right' },
+      8: { cellWidth: 25, halign: 'right', fontStyle: 'bold' },
+      9: { cellWidth: 37 }
+    },
+    margin: { left: marginX, right: marginX, bottom: 35 },
+    didParseCell: (data) => {
+      if (data.section === 'body') {
+        const item = displayItems[data.row.index];
+        if (item) {
+          // Highlight Difference Column
+          if (data.column.index === 6) {
+            if (item.difference < 0) {
+              data.cell.styles.textColor = [225, 29, 72]; // rose-600
+            } else if (item.difference > 0) {
+              data.cell.styles.textColor = [37, 99, 235]; // blue-600
+            } else {
+              data.cell.styles.textColor = [5, 150, 105]; // emerald-600
+            }
+          }
+          // Highlight Status Column
+          if (data.column.index === 9) {
+            if (item.difference < 0) {
+              data.cell.styles.textColor = [190, 18, 60];
+              data.cell.styles.fontStyle = 'bold';
+            } else if (item.difference > 0) {
+              data.cell.styles.textColor = [29, 78, 216];
+              data.cell.styles.fontStyle = 'bold';
+            } else {
+              data.cell.styles.textColor = [5, 150, 105];
+            }
+          }
+        }
+      }
+    }
+  });
+
+  // Footer & Signatures Block
+  let finalY = (doc as any).lastAutoTable ? (doc as any).lastAutoTable.finalY + 6 : cardY + cardHeight + 20;
+
+  if (customNotes && customNotes.trim().length > 0) {
+    if (finalY > pageHeight - 45) {
+      doc.addPage();
+      finalY = 20;
+    }
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(7.5);
+    doc.setTextColor(100, 116, 139);
+    doc.text(`Catatan Berita Acara: ${customNotes}`, marginX, finalY);
+    finalY += 6;
+  }
+
+  if (finalY > pageHeight - 38) {
+    doc.addPage();
+    finalY = 20;
+  }
+
+  const signY = finalY;
+  const colWidth = 60;
+  const rightColX = pageWidth - marginX - colWidth;
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(71, 85, 105);
+  doc.text(`${storeCity}, ${today.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`, rightColX, signY);
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8.5);
+  doc.setTextColor(15, 23, 42);
+  doc.text('Dibuat & Diverifikasi:', marginX + 8, signY + 5);
+  doc.text('Mengetahui,', rightColX, signY + 5);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.text('Petugas Pemeriksa Gudang', marginX + 8, signY + 10);
+  doc.text('Manajer Operasional GreenMart', rightColX, signY + 10);
+
+  // Line for signature
+  doc.setDrawColor(148, 163, 184);
+  doc.setLineWidth(0.6);
+  doc.line(marginX + 8, signY + 24, marginX + 8 + 52, signY + 24);
+  doc.line(rightColX, signY + 24, rightColX + 52, signY + 24);
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8.5);
+  doc.setTextColor(15, 23, 42);
+  doc.text(`( ${auditorName} )`, marginX + 8, signY + 28.5);
+  doc.text(`( ${managerName} )`, rightColX, signY + 28.5);
+
+  // Page numbering
+  const totalPages = doc.getNumberOfPages();
+  for (let i = 1; i <= totalPages; i++) {
+    doc.setPage(i);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.5);
+    doc.setTextColor(148, 163, 184);
+    doc.text(
+      `GreenMart Supermarket Batang - Berita Acara Stock Opname | Dokumen: ${docId}`,
+      marginX,
+      pageHeight - 6.5
+    );
+    doc.text(
+      `Halaman ${i} dari ${totalPages}`,
+      pageWidth - marginX - 25,
+      pageHeight - 6.5
+    );
+  }
+
+  return doc;
+}
+
+/**
+ * Direct download helper for Stock Opname Audit PDF report
+ */
+export function exportStockOpnameAuditPdf(
+  items: StockComparisonItem[],
+  options: StockOpnamePdfOptions = {}
+): void {
+  const doc = generateStockOpnameAuditPdf(items, options);
+  const todayStr = new Date().toISOString().split('T')[0];
+  const filename = `Berita_Acara_Stock_Opname_GreenMart_${todayStr}.pdf`;
+  doc.save(filename);
+}
+
+/**
+ * Direct print helper for Stock Opname Audit PDF report
+ */
+export function printStockOpnameAuditPdf(
+  items: StockComparisonItem[],
+  options: StockOpnamePdfOptions = {}
+): void {
+  const doc = generateStockOpnameAuditPdf(items, options);
+  doc.autoPrint();
+  const blobUrl = doc.output('bloburl');
+  const printWindow = window.open(blobUrl, '_blank');
+  if (!printWindow) {
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = String(blobUrl);
+    document.body.appendChild(iframe);
+    iframe.onload = () => {
+      iframe.contentWindow?.print();
+    };
+  }
+}
+
 
 

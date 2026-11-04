@@ -13,7 +13,9 @@ import {
   FileDown,
   Printer,
   Download,
-  X
+  X,
+  FileSpreadsheet,
+  Clock
 } from 'lucide-react';
 import { Chart, registerables } from 'chart.js';
 import { GreenMartProduct, GreenMartTransaction, DailyStatisticalReport } from '../types';
@@ -28,12 +30,14 @@ interface GreenMartStatisticsDashboardProps {
   products: GreenMartProduct[];
   transactions: GreenMartTransaction[];
   onShowToast?: (message: string, type?: 'success' | 'error' | 'info') => void;
+  onOpenGoogleSheetsModal?: () => void;
 }
 
 export const GreenMartStatisticsDashboard: React.FC<GreenMartStatisticsDashboardProps> = ({
   products,
   transactions,
-  onShowToast
+  onShowToast,
+  onOpenGoogleSheetsModal
 }) => {
   const todayStr = useMemo(() => new Date().toISOString().split('T')[0], []);
   const yesterdayStr = useMemo(() => {
@@ -139,16 +143,16 @@ export const GreenMartStatisticsDashboard: React.FC<GreenMartStatisticsDashboard
 
     if (sortedTrx.length === 0) {
       return {
-        labels: ['08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00'],
+        labels: ['07:00 (Buka)', '08:30', '10:00', '11:30', '13:00', '14:30', '15:30 (Tutup)'],
         omsetData: [0, 0, 0, 0, 0, 0, 0],
         modalData: [0, 0, 0, 0, 0, 0, 0],
         labaData: [0, 0, 0, 0, 0, 0, 0]
       };
     }
 
-    // If <= 12 transactions: use individual transaction timestamps
+    // If <= 12 transactions: use individual transaction timestamps starting from opening 07:00
     if (sortedTrx.length <= 12) {
-      const labels: string[] = ['Buka (08:00)'];
+      const labels: string[] = ['Buka (07:00)'];
       const omsetData: number[] = [0];
       const modalData: number[] = [0];
       const labaData: number[] = [0];
@@ -158,7 +162,7 @@ export const GreenMartStatisticsDashboard: React.FC<GreenMartStatisticsDashboard
       let runningLaba = 0;
 
       sortedTrx.forEach((trx) => {
-        const timeLabel = (trx.time || '00:00').substring(0, 5);
+        const timeLabel = (trx.time || '07:00').substring(0, 5);
         labels.push(`${timeLabel} (#${trx.invoiceNumber.slice(-3)})`);
         const trxCost = trx.items.reduce((sum, item) => sum + (item.costPrice || 0) * item.qty, 0);
         const trxProfit = trx.grandTotal - trxCost;
@@ -180,14 +184,29 @@ export const GreenMartStatisticsDashboard: React.FC<GreenMartStatisticsDashboard
       return { labels, omsetData, modalData, labaData };
     }
 
-    // If > 12 transactions: bucket into hourly slots
+    // If > 12 transactions: bucket into operational hours (07:00 - 15:30 WIB)
+    const operationalHours = ['07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '15:30'];
     const hourMap = new Map<string, { omset: number; modal: number; laba: number }>();
-    const hours = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00'];
-    hours.forEach(h => hourMap.set(h, { omset: 0, modal: 0, laba: 0 }));
+    operationalHours.forEach(h => hourMap.set(h, { omset: 0, modal: 0, laba: 0 }));
 
     sortedTrx.forEach(trx => {
-      const hourNum = parseInt(trx.time?.split(':')[0] || '8', 10);
-      const slotHour = `${hourNum.toString().padStart(2, '0')}:00`;
+      const parts = (trx.time || '07:00').split(':');
+      const hourNum = parseInt(parts[0] || '7', 10);
+      const minNum = parseInt(parts[1] || '0', 10);
+
+      let slotHour = '07:00';
+      if (hourNum < 7) {
+        slotHour = '07:00';
+      } else if (hourNum === 15 && minNum >= 15) {
+        slotHour = '15:30';
+      } else if (hourNum === 15) {
+        slotHour = '15:00';
+      } else if (hourNum > 15) {
+        slotHour = '15:30'; // Clamp transactions beyond 15:30 to closing bucket
+      } else {
+        slotHour = `${hourNum.toString().padStart(2, '0')}:00`;
+      }
+
       const existing = hourMap.get(slotHour) || { omset: 0, modal: 0, laba: 0 };
       const trxCost = trx.items.reduce((sum, item) => sum + (item.costPrice || 0) * item.qty, 0);
       existing.omset += trx.grandTotal;
@@ -482,14 +501,11 @@ export const GreenMartStatisticsDashboard: React.FC<GreenMartStatisticsDashboard
     <div className="space-y-6">
       
       {/* Top Controls: Date Filter & Formula Explanation Trigger */}
-      <div className="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row items-center justify-between gap-3">
-        <div>
-          <div className="flex flex-wrap items-center gap-2">
-            <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-              <span>Rekap Data Statistik Harian GreenMart</span>
-              <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
-                MySQL View
-              </span>
+      <div className="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-3 sm:gap-4">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+            <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight">
+              Rekap Data Statistik Harian GreenMart
             </h2>
             <LiveClock variant="compact" />
           </div>
@@ -498,17 +514,17 @@ export const GreenMartStatisticsDashboard: React.FC<GreenMartStatisticsDashboard
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 w-full md:w-auto justify-end">
+        <div className="flex flex-wrap items-center gap-2 w-full md:w-auto justify-start md:justify-end">
           
           {/* Quick Date Pills */}
-          <div className="flex items-center rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 p-1 text-xs">
+          <div className="flex items-center rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 p-1 text-xs shrink-0">
             <button
               type="button"
               onClick={() => setSelectedDateFilter(todayStr)}
-              className={`px-3 py-1.5 rounded-lg font-bold transition cursor-pointer text-xs sm:text-sm ${
+              className={`px-2.5 sm:px-3 py-1.5 rounded-lg font-bold transition cursor-pointer text-xs sm:text-sm ${
                 selectedDateFilter === todayStr
                   ? 'bg-emerald-600 text-white shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               Hari Ini
@@ -516,10 +532,10 @@ export const GreenMartStatisticsDashboard: React.FC<GreenMartStatisticsDashboard
             <button
               type="button"
               onClick={() => setSelectedDateFilter(yesterdayStr)}
-              className={`px-3 py-1.5 rounded-lg font-bold transition cursor-pointer text-xs sm:text-sm ${
+              className={`px-2.5 sm:px-3 py-1.5 rounded-lg font-bold transition cursor-pointer text-xs sm:text-sm ${
                 selectedDateFilter === yesterdayStr
                   ? 'bg-emerald-600 text-white shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               Kemarin
@@ -527,21 +543,34 @@ export const GreenMartStatisticsDashboard: React.FC<GreenMartStatisticsDashboard
             <button
               type="button"
               onClick={() => setSelectedDateFilter('all')}
-              className={`px-3 py-1.5 rounded-lg font-bold transition cursor-pointer text-xs sm:text-sm ${
+              className={`px-2.5 sm:px-3 py-1.5 rounded-lg font-bold transition cursor-pointer text-xs sm:text-sm ${
                 selectedDateFilter === 'all'
                   ? 'bg-emerald-600 text-white shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               Semua
             </button>
           </div>
 
+          {/* Tombol Simpan ke Google Spreadsheet */}
+          {onOpenGoogleSheetsModal && (
+            <button
+              type="button"
+              onClick={onOpenGoogleSheetsModal}
+              className="px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl border border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 font-bold text-xs sm:text-sm flex items-center gap-1.5 transition cursor-pointer shadow-2xs shrink-0"
+              title="Simpan data keuangan &amp; statistik ke Google Spreadsheet"
+            >
+              <FileSpreadsheet className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <span>Google Sheets</span>
+            </button>
+          )}
+
           {/* Ekspor Laporan PDF Button */}
           <button
             type="button"
             onClick={() => setShowExportPdfModal(true)}
-            className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 active:scale-95 text-white font-bold text-xs sm:text-sm flex items-center gap-2 shadow-sm transition cursor-pointer"
+            className="px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 active:scale-95 text-white font-bold text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 shadow-sm transition cursor-pointer shrink-0"
             title="Ekspor Laporan Keuangan & Statistik Resmi ke PDF (A4)"
           >
             <FileDown className="w-4 h-4" />
@@ -552,7 +581,8 @@ export const GreenMartStatisticsDashboard: React.FC<GreenMartStatisticsDashboard
           <button
             type="button"
             onClick={() => setShowSqlFormulaModal(true)}
-            className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer"
+            className="px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 transition cursor-pointer shrink-0"
+            title="Penjelasan Rumus Matematis: Modus, Mean, dan Total Omset"
           >
             <Calculator className="w-4 h-4 text-emerald-600" />
             <span>Rumus Statistik</span>
@@ -773,12 +803,18 @@ export const GreenMartStatisticsDashboard: React.FC<GreenMartStatisticsDashboard
         <div className="lg:col-span-7 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3.5">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
             <div>
-              <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-emerald-600" />
-                <span>Grafik 1: Perbandingan Omset, Modal, &amp; Laba (Kurva Garis Fluktuasi)</span>
-              </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Analisis pergerakan fluktuasi finansial real-time berbasis kurva spline
+              <div className="flex flex-wrap items-center gap-2">
+                <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 text-emerald-600" />
+                  <span>Grafik 1: Perbandingan Omset, Modal, &amp; Laba (Kurva Garis Fluktuasi)</span>
+                </h3>
+                <span className="px-2 py-0.5 rounded-md text-[11px] font-bold bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 flex items-center gap-1 font-mono">
+                  <Clock className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                  <span>07:00 - 15:30 WIB</span>
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Rentang fluktuasi finansial jam operasional toko (07:00 - 15:30 WIB) berbasis kurva spline
               </p>
             </div>
 

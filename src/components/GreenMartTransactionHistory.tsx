@@ -12,11 +12,13 @@ import {
   X,
   CalendarCheck,
   Globe,
-  FileDown
+  FileDown,
+  FileSpreadsheet
 } from 'lucide-react';
-import { GreenMartTransaction } from '../types';
+import { GreenMartTransaction, CashierProfile } from '../types';
 import { GreenMartReceiptModal } from './GreenMartReceiptModal';
 import { GreenMartConfirmModal } from './GreenMartConfirmModal';
+import { GreenMartExportTransactionPdfModal } from './GreenMartExportTransactionPdfModal';
 import { 
   exportGreenMartReceiptPdf, 
   openReceiptDirectWebPage 
@@ -36,13 +38,19 @@ interface GreenMartTransactionHistoryProps {
       cashierName?: string;
     }
   ) => void;
+  activeCashier?: CashierProfile;
+  onShowToast?: (message: string, type?: 'success' | 'error' | 'info') => void;
+  onOpenGoogleSheetsModal?: () => void;
 }
 
 export const GreenMartTransactionHistory: React.FC<GreenMartTransactionHistoryProps> = ({
   transactions,
   onCancelTransaction,
   onBulkDeleteTransactions,
-  onSettleTransaction
+  onSettleTransaction,
+  activeCashier,
+  onShowToast,
+  onOpenGoogleSheetsModal
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [dateFilter, setDateFilter] = useState<'today' | 'yesterday' | '7days' | 'all'>('all');
@@ -64,6 +72,7 @@ export const GreenMartTransactionHistory: React.FC<GreenMartTransactionHistoryPr
   // Modals state
   const [selectedTrxForReceipt, setSelectedTrxForReceipt] = useState<GreenMartTransaction | null>(null);
   const [trxToCancel, setTrxToCancel] = useState<GreenMartTransaction | null>(null);
+  const [isExportPdfModalOpen, setIsExportPdfModalOpen] = useState(false);
 
   const todayStr = useMemo(() => new Date().toISOString().split('T')[0], []);
   const yesterdayStr = useMemo(() => {
@@ -185,24 +194,7 @@ export const GreenMartTransactionHistory: React.FC<GreenMartTransactionHistoryPr
   };
 
   const handleExportPdfReport = () => {
-    const periodLabel = dateFilter === 'today'
-      ? 'Hari Ini'
-      : dateFilter === 'yesterday'
-      ? 'Kemarin'
-      : dateFilter === '7days'
-      ? '7 Hari Terakhir'
-      : 'Semua Periode';
-
-    exportTransactionHistoryReportPdf(filteredTransactions, {
-      dateFilterLabel: periodLabel,
-      statusFilter: statusFilter === 'all' ? 'Semua Status' : statusFilter,
-      cashierFilter: cashierFilter === 'all' ? 'Semua Kasir' : cashierFilter,
-      storeName: 'GREENMART SUPERMARKET & POS',
-      storeAddress: 'Jl. Ki Mangunsarkoro No.2, 03, Dracik Barat, Proyonanggan Sel., Kec. Batang, Kabupaten Batang, Jawa Tengah 51216 | Telp: (0285) 391-234 | Email: batang@greenmart.id',
-      storeCity: 'Batang',
-      cashierName: cashierFilter !== 'all' ? cashierFilter : 'Kasir Penanggung Jawab',
-      managerName: 'Bambang S., S.E.'
-    });
+    setIsExportPdfModalOpen(true);
   };
 
   return (
@@ -352,12 +344,25 @@ export const GreenMartTransactionHistory: React.FC<GreenMartTransactionHistoryPr
             </select>
           )}
 
+          {/* Tombol Simpan ke Google Spreadsheet */}
+          {onOpenGoogleSheetsModal && (
+            <button
+              type="button"
+              onClick={onOpenGoogleSheetsModal}
+              className="px-3.5 py-2.5 rounded-xl border border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 font-bold text-xs sm:text-sm flex items-center gap-1.5 transition cursor-pointer shrink-0 shadow-2xs"
+              title="Simpan riwayat transaksi ke Google Spreadsheet (Cloud Webhook / .xlsx)"
+            >
+              <FileSpreadsheet className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <span>Google Sheets</span>
+            </button>
+          )}
+
           {/* Tombol Unduh Laporan PDF Riwayat */}
           <button
             type="button"
             onClick={handleExportPdfReport}
             className="px-3.5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm flex items-center gap-1.5 shadow-xs transition cursor-pointer shrink-0"
-            title="Unduh Laporan Resmi Riwayat Transaksi format PDF dengan Kop Surat Batang"
+            title="Unduh Laporan Resmi Riwayat Transaksi format PDF dengan Personalisasi Dokumen & Kop Batang"
           >
             <FileDown className="w-4 h-4" />
             <span>Unduh PDF Riwayat</span>
@@ -841,6 +846,26 @@ export const GreenMartTransactionHistory: React.FC<GreenMartTransactionHistoryPr
           </div>
         </div>
       )}
+
+      {/* Modal Personalisasi Unduh PDF Riwayat Transaksi */}
+      <GreenMartExportTransactionPdfModal
+        isOpen={isExportPdfModalOpen}
+        onClose={() => setIsExportPdfModalOpen(false)}
+        transactions={filteredTransactions}
+        dateFilterLabel={
+          dateFilter === 'today'
+            ? 'Hari Ini'
+            : dateFilter === 'yesterday'
+            ? 'Kemarin'
+            : dateFilter === '7days'
+            ? '7 Hari Terakhir'
+            : 'Semua Periode'
+        }
+        statusFilter={statusFilter === 'all' ? 'Semua Status' : statusFilter}
+        cashierFilter={cashierFilter === 'all' ? 'Semua Kasir' : cashierFilter}
+        activeCashier={activeCashier}
+        onShowToast={onShowToast}
+      />
 
     </div>
   );

@@ -563,9 +563,9 @@ export const GreenMartCashier: React.FC<GreenMartCashierProps> = ({
         {/* SISI KIRI (7 Kolom): KERANJANG BELANJA & KATALOG PRODUK */}
         <div className="lg:col-span-7 flex flex-col h-full min-h-0 gap-2">
           
-          {/* TABEL KERANJANG BELANJA */}
-          <div className="flex-1 min-h-[220px] bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs flex flex-col overflow-hidden">
-            <div className="px-4 py-2.5 bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0">
+          {/* TABEL KERANJANG BELANJA - AREA SCROLL BOUNDED */}
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs flex flex-col overflow-hidden shrink-0">
+            <div className="px-4 py-2 bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0">
               <div className="flex items-center gap-2">
                 <ShoppingCart className="w-4 h-4 text-emerald-600" />
                 <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">
@@ -588,12 +588,12 @@ export const GreenMartCashier: React.FC<GreenMartCashierProps> = ({
               )}
             </div>
 
-            {/* List Cart Items with Internal Scroll */}
-            <div className="flex-1 min-h-0 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800">
+            {/* List Cart Items with Internal Scroll Area - Tidak tertampil semua dalam satu waktu (maksimal 3-4 item terlihat) */}
+            <div className="max-h-[195px] sm:max-h-[215px] overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800 scrollbar-thin scrollbar-thumb-emerald-500/30 hover:scrollbar-thumb-emerald-500/50 scrollbar-track-transparent">
               {cart.length === 0 ? (
-                <div className="h-full min-h-[160px] flex flex-col items-center justify-center p-4 text-center">
-                  <div className="w-10 h-10 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mb-2">
-                    <ShoppingCart className="w-5 h-5" />
+                <div className="py-7 px-4 flex flex-col items-center justify-center text-center">
+                  <div className="w-9 h-9 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mb-1.5">
+                    <ShoppingCart className="w-4 h-4" />
                   </div>
                   <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300">
                     Keranjang Masih Kosong
@@ -623,7 +623,7 @@ export const GreenMartCashier: React.FC<GreenMartCashierProps> = ({
                         <button
                           type="button"
                           onClick={() => handleUpdateQty(item.product.id, -1)}
-                          className="w-7 h-7 flex items-center justify-center text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 font-bold transition"
+                          className="w-7 h-7 flex items-center justify-center text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 font-bold transition cursor-pointer"
                         >
                           <Minus className="w-3 h-3" />
                         </button>
@@ -633,7 +633,7 @@ export const GreenMartCashier: React.FC<GreenMartCashierProps> = ({
                         <button
                           type="button"
                           onClick={() => handleUpdateQty(item.product.id, 1)}
-                          className="w-7 h-7 flex items-center justify-center text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 font-bold transition"
+                          className="w-7 h-7 flex items-center justify-center text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 font-bold transition cursor-pointer"
                         >
                           <Plus className="w-3 h-3" />
                         </button>
@@ -658,10 +658,21 @@ export const GreenMartCashier: React.FC<GreenMartCashierProps> = ({
                 ))
               )}
             </div>
+
+            {/* Scroll Indicator Hint if cart has more than 3 items */}
+            {cart.length > 3 && (
+              <div className="px-3 py-1 bg-slate-50 dark:bg-slate-800/60 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[10.5px] text-slate-400 shrink-0">
+                <span>Total {cart.length} item ({totalUnitsCount} unit)</span>
+                <span className="flex items-center gap-1 font-semibold text-emerald-600 dark:text-emerald-400">
+                  <span>Area scroll (gulir untuk lihat semua)</span>
+                  <span className="text-xs">&darr;</span>
+                </span>
+              </div>
+            )}
           </div>
 
           {/* KATALOG PRODUK CEPAT (COMPACT BOTTOM STRIP) */}
-          <div className="h-40 sm:h-44 shrink-0 bg-white dark:bg-slate-900 p-2.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs flex flex-col space-y-1.5">
+          <div className="flex-1 min-h-[170px] bg-white dark:bg-slate-900 p-2.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs flex flex-col space-y-1.5 overflow-hidden">
             <div className="flex items-center justify-between gap-2 shrink-0">
               <div className="flex items-center gap-1.5 overflow-x-auto">
                 <button

@@ -101,6 +101,10 @@ export const GreenMartLogin: React.FC<GreenMartLoginProps> = ({ onLoginSuccess }
           <p className="text-[11px] text-emerald-300/80 font-medium mt-0.5">
             Sistem Kasir Barcode &amp; Rekap Statistik Koperasi
           </p>
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 text-[10px] font-mono font-bold mt-1.5">
+            <Clock className="w-3 h-3 text-emerald-400" />
+            <span>Jam Operasional: 07:00 - 15:30 WIB</span>
+          </div>
         </div>
 
         {/* Login Main Box */}
@@ -185,23 +189,35 @@ export const GreenMartLogin: React.FC<GreenMartLoginProps> = ({ onLoginSuccess }
 
             {/* Shift Duty Option */}
             <div className="space-y-1 pt-0.5">
-              <label className="block text-[10px] font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1">
-                <Clock className="w-3 h-3 text-emerald-400" />
-                <span>Shift Jaga Hari Ini</span>
-              </label>
-              <div className="grid grid-cols-4 gap-1.5">
-                {(['Pagi', 'Siang', 'Sore', 'Full Day'] as CashierShiftType[]).map((s) => (
+              <div className="flex items-center justify-between">
+                <label className="block text-[10px] font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1">
+                  <Clock className="w-3 h-3 text-emerald-400" />
+                  <span>Shift Jaga (07:00 - 15:30 WIB)</span>
+                </label>
+                <span className="text-[9.5px] font-mono text-emerald-400 font-bold">
+                  Operasional
+                </span>
+              </div>
+              <div className="grid grid-cols-3 gap-1.5">
+                {[
+                  { shift: 'Pagi' as CashierShiftType, label: 'Pagi', time: '07:00-11:30' },
+                  { shift: 'Siang' as CashierShiftType, label: 'Siang', time: '11:30-15:30' },
+                  { shift: 'Full Day' as CashierShiftType, label: 'Full Day', time: '07:00-15:30' }
+                ].map((s) => (
                   <button
-                    key={s}
+                    key={s.shift}
                     type="button"
-                    onClick={() => setShift(s)}
-                    className={`py-1.5 px-1 rounded-lg text-[11px] font-bold transition border cursor-pointer text-center ${
-                      shift === s
+                    onClick={() => setShift(s.shift)}
+                    className={`py-1.5 px-1 rounded-lg text-[10.5px] font-bold transition border cursor-pointer text-center flex flex-col items-center justify-center ${
+                      shift === s.shift
                         ? 'bg-emerald-600 text-white border-emerald-500 shadow-xs'
                         : 'bg-slate-800/60 text-slate-400 border-slate-700 hover:bg-slate-800 hover:text-slate-200'
                     }`}
                   >
-                    {s}
+                    <span>{s.label}</span>
+                    <span className={`text-[9px] font-mono ${shift === s.shift ? 'text-emerald-100 font-bold' : 'text-slate-500'}`}>
+                      {s.time}
+                    </span>
                   </button>
                 ))}
               </div>
